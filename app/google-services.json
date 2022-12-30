@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1042182187278",
+    "project_id": "steamapp-558cf",
+    "storage_bucket": "steamapp-558cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042182187278:android:8ec0d64e08db6f9c39cf5f",
+        "android_client_info": {
+          "package_name": "com.esgi.steamapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042182187278-ccak3k2rmnfpf86n02iet6ke3afb5g78.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.esgi.steamapp",
+            "certificate_hash": "341fa0091bff50cab82f6770b1edf2880508f7b8"
+          }
+        },
+        {
+          "client_id": "1042182187278-netvbt8fdtllijsj918vdsbhi4lu383o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzEGfrP6_Aj7C2V9C86pwtNsmhl5lvKRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042182187278-netvbt8fdtllijsj918vdsbhi4lu383o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
