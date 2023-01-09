@@ -90,7 +90,7 @@ class HomePageActivity : AppCompatActivity() {
         recycler_view = findViewById(R.id.game_list)
         recycler_view.apply{
             layoutManager = GridLayoutManager(this@HomePageActivity,1)
-            adapter = ListAdapter(games)
+            adapter = ListAdapter(games, this)
         }
 
     }
@@ -126,15 +126,20 @@ class HomePageActivity : AppCompatActivity() {
 
 data class Game(val name : String, val editeur : String, val prix : String,val image : String)
 
-class ListAdapter(val games: MutableList<Game>) : RecyclerView.Adapter<GameViewHolder>() {
+class ListAdapter(private val games: MutableList<Game>, private val itemClickListener: ItemCLickListerner) : RecyclerView.Adapter<GameViewHolder>() {
 
     override fun getItemCount(): Int = games.size
+
+    interface ItemCLickListerner {
+        fun onItemClick(game: Game)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
         return GameViewHolder(
             LayoutInflater.from(parent.context).inflate(
                 R.layout.game_cell, parent, false
-            )
+            ),
+            itemClickListener
         )
     }
 
@@ -146,7 +151,7 @@ class ListAdapter(val games: MutableList<Game>) : RecyclerView.Adapter<GameViewH
 
 }
 
-class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+class GameViewHolder(v: View, itemClickListener: ListAdapter.ItemCLickListerner) : RecyclerView.ViewHolder(v) {
 
     private val game_name = v.findViewById<TextView>(R.id.nom)
     private val editeur = v.findViewById<TextView>(R.id.editeur)
@@ -162,6 +167,10 @@ class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Glide.with(itemView.context).load(url).into(image)
+    }
+
+    fun bind(game: Game) {
+
     }
 
 }
