@@ -3,6 +3,7 @@ package com.esgi.steamapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.ImageView
@@ -10,16 +11,56 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.esgi.steamapp.databinding.HomePageBinding
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class HomePageActivity : AppCompatActivity() {
     lateinit var more_info_button : Button
     lateinit var big_image : ImageView
     lateinit var recycler_view : RecyclerView
+    var list_of_game_ids : MutableList<Int> = emptyList<Int>().toMutableList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.home_page)
+
+        val binding = HomePageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+
+        GlobalScope.launch(Dispatchers.Main) {
+            binding.progressbar.visibility = View.VISIBLE
+            binding.gameList.visibility = View.GONE
+
+            val response = withContext(Dispatchers.Default) {
+                NetworkManagerGameList.getList()
+            }
+
+            binding.progressbar.visibility = View.GONE
+            binding.gameList.visibility = View.VISIBLE
+            val api_games = response.response.ranks
+            for (i in api_games) {
+                list_of_game_ids.add(i.appid)
+            }
+        }
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val response2 = withContext(Dispatchers.Default) {
+                NetworkManagerGameDetails.getGameDetails("730")
+            }
+            binding.lesMeilleuresVentes.text = response2.success.toString()
+        }
+
+
+
 
         val url = "https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1668125812"
 
@@ -51,6 +92,7 @@ class HomePageActivity : AppCompatActivity() {
             layoutManager = GridLayoutManager(this@HomePageActivity,1)
             adapter = ListAdapter(games)
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -63,6 +105,8 @@ class HomePageActivity : AppCompatActivity() {
         R.id.like -> {
             val intent = Intent(this, LikedActivity::class.java)
             startActivity(intent)
+            val database = Firebase.database
+            val myRef = database.getReference("message")
             true
         }
 

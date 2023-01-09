@@ -22,6 +22,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.forgot_password)
+
         email = findViewById(R.id.email)
         send_mail = findViewById(R.id.send_email_button)
         back_button = findViewById(R.id.back_button)
