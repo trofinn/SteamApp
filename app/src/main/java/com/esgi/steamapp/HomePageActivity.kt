@@ -11,7 +11,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.esgi.steamapp.Adapter.GameAdapter
 import com.esgi.steamapp.databinding.HomePageBinding
+import com.esgi.steamapp.model.Game
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +23,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.URL
 
 class HomePageActivity : AppCompatActivity() {
     lateinit var more_info_button : Button
@@ -90,9 +93,15 @@ class HomePageActivity : AppCompatActivity() {
         recycler_view = findViewById(R.id.game_list)
         recycler_view.apply{
             layoutManager = GridLayoutManager(this@HomePageActivity,1)
-            adapter = ListAdapter(games)
+            adapter = GameAdapter(games, this.context)
         }
 
+    }
+
+    private fun fetchGames(): Thread {
+        return Thread{
+            val url = URL("")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -124,44 +133,6 @@ class HomePageActivity : AppCompatActivity() {
 
 }
 
-data class Game(val name : String, val editeur : String, val prix : String,val image : String)
 
-class ListAdapter(val games: MutableList<Game>) : RecyclerView.Adapter<GameViewHolder>() {
 
-    override fun getItemCount(): Int = games.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
-        return GameViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.game_cell, parent, false
-            )
-        )
-    }
-
-    override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        holder.updateGame(
-            games[position]
-        )
-    }
-
-}
-
-class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-
-    private val game_name = v.findViewById<TextView>(R.id.nom)
-    private val editeur = v.findViewById<TextView>(R.id.editeur)
-    private val prix = v.findViewById<TextView>(R.id.prix)
-    private val image = v.findViewById<ImageView>(R.id.image)
-
-    fun updateGame(game: Game) {
-        game_name.text = game.name
-        editeur.text = game.editeur
-        prix.text = game.prix
-
-        val url = game.image
-
-        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Glide.with(itemView.context).load(url).into(image)
-    }
-
-}
