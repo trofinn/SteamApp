@@ -1,12 +1,15 @@
 package com.esgi.steamapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -56,7 +59,7 @@ class HomePageActivity : AppCompatActivity() {
                 for(game_id in list_of_game_ids_test) {
                     val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
                     if(game_id == "730") {
-                        val game = Game(name = game_details.appid.data.name.toString(), editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage.toString())
+                        val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage.toString())
                         games.add(game)
                         games.add(game)
                     }
@@ -69,7 +72,16 @@ class HomePageActivity : AppCompatActivity() {
                     recycler_view = findViewById(R.id.game_list)
                     recycler_view.apply{
                         layoutManager = GridLayoutManager(this@HomePageActivity,1);
-                        adapter = ListAdapter(games);
+                        adapter = ListAdapter(games, object : OnProductListener {
+                            override fun onClicked(game : Game, position : Int) {
+                                Toast.makeText(
+                                    this@HomePageActivity,
+                                    "Game $position clicked",
+                                    Toast.LENGTH_SHORT).show();
+                                val intent = Intent(this@HomePageActivity,GameDetailsActivity::class.java)
+                                startActivity(intent)
+                            }
+                        });
                     }
                 })
             }
@@ -132,7 +144,7 @@ class HomePageActivity : AppCompatActivity() {
 
 data class Game(val name : String, val editeur : String, val prix : String,val image : String)
 
-class ListAdapter(val games: MutableList<Game>) : RecyclerView.Adapter<GameViewHolder>() {
+class ListAdapter(val games: MutableList<Game>, val listener : OnProductListener) : RecyclerView.Adapter<GameViewHolder>() {
 
     override fun getItemCount(): Int = games.size
 
@@ -145,9 +157,11 @@ class ListAdapter(val games: MutableList<Game>) : RecyclerView.Adapter<GameViewH
     }
 
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        holder.updateGame(
-            games[position]
-        )
+        val game = games[position]
+        holder.updateGame(game)
+        holder.button.setOnClickListener() {
+            listener.onClicked(game, position)
+        }
     }
 
 }
@@ -158,6 +172,8 @@ class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
     private val editeur = v.findViewById<TextView>(R.id.editeur)
     private val prix = v.findViewById<TextView>(R.id.prix)
     private val image = v.findViewById<ImageView>(R.id.image)
+    val button = v.findViewById<Button>(R.id.en_savoir_plus_button)
+
 
     fun updateGame(game: Game) {
         game_name.text = game.name
@@ -171,6 +187,12 @@ class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
             .load(url)
             .centerCrop()
             .into(image)
+    }
+}
+
+interface OnProductListener {
+    fun onClicked(game : Game, position : Int) {
+
     }
 
 }

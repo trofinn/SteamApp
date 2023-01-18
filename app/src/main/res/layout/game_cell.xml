@@ -5,7 +5,10 @@
     android:layout_margin="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="10dp"
-    app:cardElevation="10dp">
+    app:cardElevation="10dp"
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,7 +32,7 @@
             android:fontFamily="@font/google_sans_regular"
             android:text="Editeur"
             android:textColor="@color/grey"
-            android:textSize="15sp"
+            android:textSize="10sp"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +45,7 @@
             android:fontFamily="@font/google_sans_regular"
             android:text="Nom"
             android:textColor="@color/grey"
-            android:textSize="20sp"
+            android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintBottom_toTopOf="@id/editeur"
             android:layout_marginStart="10dp"/>
@@ -54,7 +57,7 @@
             android:fontFamily="@font/google_sans_regular"
             android:text="Prix"
             android:textColor="@color/grey"
-            android:textSize="15sp"
+            android:textSize="10sp"
             app:layout_constraintStart_toEndOf="@id/image"
             app:layout_constraintTop_toBottomOf="@id/editeur"
             android:layout_marginTop="15dp"
@@ -68,7 +71,8 @@
             android:text="En savoir plus"
             android:fontFamily="@font/google_sans_regular"
             android:textColor="@color/grey"
-            android:backgroundTint="@color/button"/>
+            android:backgroundTint="@color/button"
+            android:id="@+id/en_savoir_plus_button"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

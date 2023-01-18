@@ -1,5 +1,6 @@
 package com.esgi.steamapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -32,7 +34,16 @@ class LikedActivity : AppCompatActivity() {
         recycler_view = findViewById(R.id.game_list)
         recycler_view.apply{
             layoutManager = GridLayoutManager(this@LikedActivity,1)
-            adapter = ListAdapter(games)
+            adapter = ListAdapter(games, object : OnProductListener {
+                override fun onClicked(game : Game, position : Int) {
+                    Toast.makeText(
+                        this@LikedActivity,
+                        "Game $position clicked",
+                        Toast.LENGTH_SHORT).show();
+                    val intent = Intent(this@LikedActivity,GameDetailsActivity::class.java)
+                    startActivity(intent)
+                }
+            });
         }
     }
 }
