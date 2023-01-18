@@ -1,32 +1,33 @@
 package com.esgi.steamapp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.esgi.steamapp.databinding.HomePageBinding
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
 
 class HomePageActivity : AppCompatActivity() {
     lateinit var more_info_button : Button
     lateinit var big_image : ImageView
     lateinit var recycler_view : RecyclerView
     var list_of_game_ids : MutableList<Int> = emptyList<Int>().toMutableList()
+    val games = mutableListOf<Game>()
+    var list_of_game_ids_test : MutableList<String> = emptyList<String>().toMutableList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +35,9 @@ class HomePageActivity : AppCompatActivity() {
         val binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        list_of_game_ids_test.add("730")
+        list_of_game_ids_test.add("578080");
 
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -43,27 +47,49 @@ class HomePageActivity : AppCompatActivity() {
             val response = withContext(Dispatchers.Default) {
                 NetworkManagerGameList.getList()
             }
-
-            binding.progressbar.visibility = View.GONE
-            binding.gameList.visibility = View.VISIBLE
             val api_games = response.response.ranks
             for (i in api_games) {
                 list_of_game_ids.add(i.appid)
             }
+
+            withContext(Dispatchers.Default) {
+                for(game_id in list_of_game_ids_test) {
+                    val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
+                    if(game_id == "730") {
+                        val game = Game(name = game_details.appid.data.name.toString(), editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage.toString())
+                        games.add(game)
+                        games.add(game)
+                    }
+                    if(game_id == "578080"){
+                        val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage.toString())
+                        games.add(game)
+                    }
+                }
+                runOnUiThread(java.lang.Runnable {
+                    recycler_view = findViewById(R.id.game_list)
+                    recycler_view.apply{
+                        layoutManager = GridLayoutManager(this@HomePageActivity,1);
+                        adapter = ListAdapter(games);
+                    }
+                })
+            }
+
+            binding.progressbar.visibility = View.GONE
+            binding.gameList.visibility = View.VISIBLE
         }
 
+        /*
         GlobalScope.launch(Dispatchers.Main) {
             val response2 = withContext(Dispatchers.Default) {
-                NetworkManagerGameDetails.getGameDetails("730")
+                val gameService = RetrofitClientInstance
+                    .getRetrofitInstance(ApiJavaTest::class.java, GetItemDetailsDeserializer())
+                    .create(GameService::class.java)
+                val test = gameService.getDetailsOfGame("730")
             }
-            binding.lesMeilleuresVentes.text = response2.success.toString()
         }
-
-
-
+         */
 
         val url = "https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1668125812"
-
         big_image = findViewById(R.id.big_game)
         big_image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Glide.with(this).load(url).into(big_image)
@@ -73,26 +99,6 @@ class HomePageActivity : AppCompatActivity() {
             val intent = Intent(this, HomePageActivity::class.java)
             startActivity(intent)
         }
-
-
-        val games = mutableListOf<Game>()
-
-        val game = Game(name = "Counter Strike", editeur = "Gesco", prix = "10,00 $", image = "https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1668125812")
-        games.add(game)
-        games.add(game)
-        games.add(game)
-        games.add(game)
-        games.add(game)
-        games.add(game)
-        games.add(game)
-        games.add(game)
-
-        recycler_view = findViewById(R.id.game_list)
-        recycler_view.apply{
-            layoutManager = GridLayoutManager(this@HomePageActivity,1)
-            adapter = ListAdapter(games)
-        }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -161,7 +167,10 @@ class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val url = game.image
 
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Glide.with(itemView.context).load(url).into(image)
+        Glide.with(itemView.context)
+            .load(url)
+            .centerCrop()
+            .into(image)
     }
 
 }

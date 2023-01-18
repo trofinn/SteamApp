@@ -39,8 +39,6 @@ class MainActivity : AppCompatActivity() {
 
         login_button.setOnClickListener() {
             login()
-            val intent = Intent(this, HomePageActivity::class.java)
-            startActivity(intent)
         }
 
         forgot_password.setOnClickListener() {
@@ -67,9 +65,10 @@ class MainActivity : AppCompatActivity() {
             task ->
             if (task.isSuccessful) {
                 Toast.makeText(this, "Connexion Success", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, HomePageActivity::class.java)
+                startActivity(intent)
             }
             else {
-                Log.w(TAG,"eeeeeeeeeeeee {${email.toString()}}")
                 Log.w(TAG, "createUserWithEmail:failure ", task.exception)
                 Toast.makeText(this, "Connexion Echoué", Toast.LENGTH_SHORT).show()
             }
