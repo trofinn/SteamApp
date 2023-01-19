@@ -108,7 +108,7 @@ class HomePageActivity : AppCompatActivity() {
 
         more_info_button = findViewById(R.id.button)
         more_info_button.setOnClickListener() {
-            val intent = Intent(this, HomePageActivity::class.java)
+            val intent = Intent(this, GameDetailsActivity::class.java)
             startActivity(intent)
         }
     }
@@ -121,6 +121,9 @@ class HomePageActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.like -> {
+            val binding = HomePageBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+
             val intent = Intent(this, LikedActivity::class.java)
             startActivity(intent)
             val database = Firebase.database
@@ -129,8 +132,8 @@ class HomePageActivity : AppCompatActivity() {
         }
 
         R.id.favorite -> {
-            // User chose the "Favorite" action, mark the current item
-            // as a favorite...
+            val intent = Intent(this, FavoriteActivity::class.java)
+            startActivity(intent)
             true
         }
         else -> {

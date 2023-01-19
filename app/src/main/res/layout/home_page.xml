@@ -93,12 +93,12 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="5dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="1dp"
                 android:text="En savoir plus"
                 android:textColor="@color/grey"
                 android:fontFamily="@font/google_sans_regular"
-                android:background="@color/button"/>
+                android:background="@color/button"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="1dp"/>
 
             <TextView
                 android:id="@+id/description"
