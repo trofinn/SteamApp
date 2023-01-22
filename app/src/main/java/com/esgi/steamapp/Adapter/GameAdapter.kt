@@ -12,8 +12,13 @@ import com.bumptech.glide.Glide
 import com.esgi.steamapp.R
 import com.esgi.steamapp.model.Game
 
-class GameAdapter(val games: MutableList<Game>, val context: Context) :
+class GameAdapter(games: MutableList<Game>, val context: Context) :
     RecyclerView.Adapter<GameAdapter.GameViewHolder>() {
+
+    private var games: MutableList<Game>
+    init {
+        this.games = games
+    }
 
     override fun getItemCount(): Int = games.size
 
@@ -31,8 +36,9 @@ class GameAdapter(val games: MutableList<Game>, val context: Context) :
         )
     }
 
-    fun filterGame(filterTerm: String): List<Game> {
-        return this.games.filter { it.name.toLowerCase().contains(filterTerm) }
+    fun filterGame(filterList: MutableList<Game>) {
+        games = filterList
+        notifyDataSetChanged()
     }
 
     class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
@@ -48,7 +54,6 @@ class GameAdapter(val games: MutableList<Game>, val context: Context) :
             prix.text = game.prix
 
             val url = game.image
-
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             Glide.with(itemView.context).load(url).into(image)
         }
