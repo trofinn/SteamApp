@@ -1,4 +1,4 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.activities
 
 import android.content.ContentValues.TAG
 import android.content.Intent
@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.esgi.steamapp.R
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +27,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.connexion)
-        supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background))
+        supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this,
+            R.drawable.background
+        ))
 
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
 
         signup_button.setOnClickListener() {
-            val intent = Intent(this,SignUpActivity::class.java)
+            val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
 

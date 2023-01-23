@@ -54,6 +54,7 @@ class GameAdapter(games: MutableList<Game>, val context: Context) :
             prix.text = game.prix
 
             val url = game.image
+
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             Glide.with(itemView.context).load(url).into(image)
         }

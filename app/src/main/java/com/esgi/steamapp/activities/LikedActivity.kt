@@ -1,20 +1,12 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.esgi.steamapp.Adapter.GameAdapter
+import com.esgi.steamapp.R
 import com.esgi.steamapp.model.Game
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class LikedActivity : AppCompatActivity() {
     lateinit var recycler_view : RecyclerView

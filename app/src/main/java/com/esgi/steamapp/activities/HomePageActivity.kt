@@ -1,19 +1,25 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.activities
 
-import android.app.Application
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.Adapter.GameAdapter
+import com.esgi.steamapp.NetworkManagerGameDetails
+import com.esgi.steamapp.NetworkManagerGameList
+import com.esgi.steamapp.R
 import com.esgi.steamapp.databinding.HomePageBinding
 import com.esgi.steamapp.model.Game
+import com.esgi.steamapp.model.Games
+import com.esgi.steamapp.model.MyGame
+import com.esgi.steamapp.model.Rank
+import com.esgi.steamapp.services.GameService
+import com.esgi.steamapp.services.ServiceBuilder
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +29,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit.Builder
 import java.net.URL
 import java.util.*
 
@@ -35,6 +42,7 @@ class HomePageActivity : AppCompatActivity() {
     var that = this
     lateinit var game_filtered : MutableList<Game>
     lateinit var games: MutableList<Game>
+    lateinit var myGames: List<Rank>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -195,7 +203,68 @@ class HomePageActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun LoadGames() {
+        games = mutableListOf()
+        game_filtered = mutableListOf()
+
+        var gameService: GameService
+        var requestCall: Call<Game>
+
+        //initiate the service
+         /*games = myGames.map { it ->
+             {
+                 gameService = ServiceBuilder.buildService2(
+                     GameService::class.java,
+                     it.appid
+                 )
+                 requestCall = gameService.getEachGame()
+
+             }
+         }
+         */
+
+
+            //make network call asynchronously
+
+        }
+
+        }
+
+
+    }
+
+    private fun loadMyGames() {
+
+        myGames = mutableListOf()
+
+        //initiate the service
+        val gameService  = ServiceBuilder.buildService(GameService::class.java)
+        val requestCall = gameService.getMostPlayedGames()
+
+        //make network call asynchronously
+        requestCall.enqueue(object : Callback<MyGame> {
+
+            override fun onResponse(call: Call<MyGame>, response: Response<MyGame>) {
+                Log.d("Response", "onResponse: ${response.body()}")
+                if (response.isSuccessful){
+                    myGames  = response.body()!!.response.ranks
+
+                    Log.d("Response", "gamelist size : ${myGames.size}")
+
+                }else{
+                    Toast.makeText(this@HomePageActivity, "Something went wrong ${response.message()}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<MyGame>, t: Throwable) {
+                Toast.makeText(this@HomePageActivity, "Something went wrong $t", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
 }
+
 
 
 

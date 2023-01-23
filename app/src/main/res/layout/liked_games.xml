@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LikedActivity"
+    tools:context=".activities.LikedActivity"
     android:background="@color/dark_grey">
 
     <androidx.appcompat.widget.Toolbar

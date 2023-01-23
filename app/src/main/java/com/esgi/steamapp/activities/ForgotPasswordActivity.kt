@@ -1,4 +1,4 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.activities
 
 import android.content.ContentValues.TAG
 import android.content.Intent
@@ -8,8 +8,8 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.Toast
+import com.esgi.steamapp.R
 import com.google.firebase.auth.FirebaseAuth
 
 class ForgotPasswordActivity : AppCompatActivity() {
