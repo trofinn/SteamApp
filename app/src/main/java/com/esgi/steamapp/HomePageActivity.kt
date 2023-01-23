@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -17,6 +18,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.esgi.steamapp.databinding.HomePageBinding
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Runnable
@@ -59,12 +61,12 @@ class HomePageActivity : AppCompatActivity() {
                 for(game_id in list_of_game_ids_test) {
                     val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
                     if(game_id == "730") {
-                        val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage.toString())
+                        val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
                         games.add(game)
-                        games.add(game)
+                        val img = game_details.appid.data.headerImage
                     }
                     if(game_id == "578080"){
-                        val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage.toString())
+                        val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
                         games.add(game)
                     }
                 }
@@ -79,6 +81,11 @@ class HomePageActivity : AppCompatActivity() {
                                     "Game $position clicked",
                                     Toast.LENGTH_SHORT).show();
                                 val intent = Intent(this@HomePageActivity,GameDetailsActivity::class.java)
+                                intent.putExtra("game_name", game.name)
+                                intent.putExtra("game_editor", game.editeur)
+                                intent.putExtra("game_image", game.image)
+                                intent.putExtra("game_id", list_of_game_ids_test[position])
+                                intent.putExtra("game_description", game.description)
                                 startActivity(intent)
                             }
                         });
@@ -145,7 +152,7 @@ class HomePageActivity : AppCompatActivity() {
 
 }
 
-data class Game(val name : String, val editeur : String, val prix : String,val image : String)
+data class Game(val name : String, val editeur : String, val prix : String,val image : String, val description : String)
 
 class ListAdapter(val games: MutableList<Game>, val listener : OnProductListener) : RecyclerView.Adapter<GameViewHolder>() {
 

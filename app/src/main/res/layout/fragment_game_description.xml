@@ -11,13 +11,15 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/description"
             android:layout_marginStart="5dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="Bacon ipsum dolor amet rump doner brisket corned beef tri-tip. Burgdoggen t-bone leberkas, tri-tip bacon beef ribs corned beef meatball andouille fatback alcatra strip steak turkey kevin. Short loin andouille cupim boudin, hamburger burgdoggen fatback. Chislic porchetta boudin swine filet mignon tongue t-bone pancetta cupim buffalo chicken ribeye landjaeger. Sausage salami tongue, burgdoggen hamburger pork chop fatback tri-tip t-bone meatloaf alcatra. Boudin pastrami pork belly, strip steak sirloin cow hamburger beef venison alcatra drumstick."
             android:textSize="20sp"
             android:textColor="@color/grey"
-            android:fontFamily="@font/google_sans_regular"/>
+            android:fontFamily="@font/google_sans_regular"
+            android:layout_margin="20dp"/>
 
     </ScrollView>
 
