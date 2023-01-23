@@ -16,7 +16,7 @@ import com.esgi.steamapp.R
 import com.esgi.steamapp.databinding.HomePageBinding
 import com.esgi.steamapp.model.Game
 import com.esgi.steamapp.model.Games
-import com.esgi.steamapp.model.MyGame
+import com.esgi.steamapp.model.MyGames
 import com.esgi.steamapp.model.Rank
 import com.esgi.steamapp.services.GameService
 import com.esgi.steamapp.services.ServiceBuilder
@@ -42,7 +42,7 @@ class HomePageActivity : AppCompatActivity() {
     var that = this
     lateinit var game_filtered : MutableList<Game>
     lateinit var games: MutableList<Game>
-    lateinit var myGames: List<Rank>
+    lateinit var myGames: List<MyGames.Response.Rank>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,6 +144,7 @@ class HomePageActivity : AppCompatActivity() {
     private fun buildRecycleView() {
         games = mutableListOf()
         game_filtered = mutableListOf()
+        myGames = mutableListOf()
 
 
 
@@ -229,26 +230,21 @@ class HomePageActivity : AppCompatActivity() {
 
         }
 
-        }
-
-
-    }
-
     private fun loadMyGames() {
-
-        myGames = mutableListOf()
 
         //initiate the service
         val gameService  = ServiceBuilder.buildService(GameService::class.java)
         val requestCall = gameService.getMostPlayedGames()
 
-        //make network call asynchronously
-        requestCall.enqueue(object : Callback<MyGame> {
 
-            override fun onResponse(call: Call<MyGame>, response: Response<MyGame>) {
+
+        //make network call asynchronously
+        requestCall.enqueue(object : Callback<MyGames> {
+
+            override fun onResponse(call: Call<MyGames>, response: Response<MyGames>) {
                 Log.d("Response", "onResponse: ${response.body()}")
                 if (response.isSuccessful){
-                    myGames  = response.body()!!.response.ranks
+                  myGames  = response.body()!!.response.ranks
 
                     Log.d("Response", "gamelist size : ${myGames.size}")
 
@@ -257,13 +253,18 @@ class HomePageActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<MyGame>, t: Throwable) {
+            override fun onFailure(call: Call<MyGames>, t: Throwable) {
                 Toast.makeText(this@HomePageActivity, "Something went wrong $t", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-}
+        }
+
+
+
+
+
 
 
 
