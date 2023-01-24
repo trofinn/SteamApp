@@ -16,12 +16,14 @@ import com.esgi.steamapp.databinding.GameDetailsLayoutBinding
 import com.esgi.steamapp.databinding.HomePageBinding
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.w3c.dom.Text
 
 class GameDetailsActivity : AppCompatActivity() {
     private lateinit var game_name : TextView
     private lateinit var game_editor : TextView
     private lateinit var game_photo_link : String
     private lateinit var game_photo : ImageView
+    private lateinit var game_description : TextView
 
     private var game_id : Int = 0
 
@@ -35,9 +37,11 @@ class GameDetailsActivity : AppCompatActivity() {
         game_name = findViewById(R.id.nom)
         game_editor = findViewById(R.id.editeur)
         game_photo = findViewById(R.id.image)
+        game_description = findViewById(R.id.data_transition_view)
 
         game_name.text =  intent.extras?.getString("game_name")
         game_editor.text = intent.extras?.getString("game_editor")
+        game_description.text = intent.extras?.getString("game_description")
         game_photo_link = intent.extras?.getString("game_image").toString()
         game_photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Glide.with(this).load(game_photo_link).into(game_photo)
@@ -45,20 +49,20 @@ class GameDetailsActivity : AppCompatActivity() {
         game_photo = findViewById(R.id.mini_image)
         Glide.with(this).load(game_photo_link).centerCrop().into(game_photo)
 
-
-
-        supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer,GameDescriptionFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer,GameDescriptionFragment().newInstance(game_description.text.toString())).commit()
 
         findViewById<Button>(R.id.description_button).setOnClickListener() {
-            onClick(findViewById<Button>(R.id.description_button))
-            replaceFragment(GameDescriptionFragment())
+            //onClick(findViewById<Button>(R.id.description_button))
+            replaceFragment(GameDescriptionFragment().newInstance(game_description.text.toString()))
         }
         findViewById<Button>(R.id.avis_button).setOnClickListener {
-            onClick(findViewById<Button>(R.id.avis_button))
+            //onClick(findViewById<Button>(R.id.avis_button))
             replaceFragment(GameAvisFragment())
         }
 
+
     }
+
 
     private fun replaceFragment(fragment : Fragment) {
         val fragmentManager = supportFragmentManager
