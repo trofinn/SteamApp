@@ -56,6 +56,11 @@ class HomePageActivity : AppCompatActivity() {
         //load game in recyclerView
         buildRecycleView()
 
+        println("-------LOADING GAMES------- ")
+        loadMyGames()
+        //loadGames()
+
+
 
         GlobalScope.launch(Dispatchers.Main) {
             binding.progressbar.visibility = View.VISIBLE
@@ -141,6 +146,8 @@ class HomePageActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun buildRecycleView() {
         games = mutableListOf()
         game_filtered = mutableListOf()
@@ -205,25 +212,47 @@ class HomePageActivity : AppCompatActivity() {
     }
 
 
-    private fun LoadGames() {
-        games = mutableListOf()
+    private fun loadGames() {
+        var gamesList: MutableList<Games> = mutableListOf()
         game_filtered = mutableListOf()
 
         var gameService: GameService
-        var requestCall: Call<Game>
+        var requestCall: Call<Games>
 
-        //initiate the service
-         /*games = myGames.map { it ->
-             {
-                 gameService = ServiceBuilder.buildService2(
-                     GameService::class.java,
-                     it.appid
-                 )
-                 requestCall = gameService.getEachGame()
+         myGames.forEach {
+             run {
+                 gameService = ServiceBuilder.buildService2(GameService::class.java)
+                 requestCall = gameService.getEachGame(it.appid)
 
+                 requestCall.enqueue(object : Callback<Games> {
+
+                     override fun onResponse(call: Call<Games>, response: Response<Games>) {
+                         Log.d("Response", "onResponse: ${response.body()}")
+                         if (response.isSuccessful) {
+                             gamesList.add(response.body()!!)
+
+                             Log.d("Response", "gamelist size : ${gamesList.size}")
+
+                         } else {
+                             Toast.makeText(
+                                 this@HomePageActivity,
+                                 "Something went wrong ${response.message()}",
+                                 Toast.LENGTH_SHORT
+                             ).show()
+                         }
+                     }
+
+                     override fun onFailure(call: Call<Games>, t: Throwable) {
+                         Toast.makeText(
+                             this@HomePageActivity,
+                             "Something went wrong $t",
+                             Toast.LENGTH_SHORT
+                         ).show()
+                     }
+                 })
              }
          }
-         */
+
 
 
             //make network call asynchronously
@@ -234,7 +263,7 @@ class HomePageActivity : AppCompatActivity() {
 
         //initiate the service
         val gameService  = ServiceBuilder.buildService(GameService::class.java)
-        val requestCall = gameService.getMostPlayedGames()
+        val requestCall = gameService.getMostPlayedGames("ISteamChartsService/GetMostPlayedGames/v1/")
 
 
 
