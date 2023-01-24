@@ -19,7 +19,7 @@ data class Data (
     @SerializedName("name"                 ) var name                : String,
     @SerializedName("steam_appid"          ) var steamAppid          : Int,
     @SerializedName("is_free"              ) var isFree              : Boolean,
-    @SerializedName("detailed_description" ) var shortDescription    : String,
+    @SerializedName("short_description"    ) var shortDescription    : String,
     @SerializedName("header_image"         ) var headerImage         : String,
     @SerializedName("developers"           ) var developers          : ArrayList<String>,
     @SerializedName("price_overview"       ) var price               : Price,

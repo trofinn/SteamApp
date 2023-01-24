@@ -24,14 +24,25 @@ class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
 
     private val avis_list = mutableListOf<Avis>()
     private lateinit var recycler_view : RecyclerView
+    private lateinit var game_id : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
     }
 
+    public fun newInstance(game_id : String) : GameAvisFragment {
+        val fragment = GameAvisFragment()
+        val bundle = Bundle()
+        bundle.putString("game_id", game_id)
+        fragment.arguments = bundle
+        return fragment
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+        val view: View = inflater.inflate(R.layout.fragment_game_avis, container, false)
+        game_id = arguments?.getString("game_id").toString()
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,7 +55,7 @@ class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
             avis_list_rview.visibility = View.INVISIBLE
 
             val response = withContext(Dispatchers.Default) {
-                NetworkManagerAvisList.getListAvis("730")
+                NetworkManagerAvisList.getListAvis(game_id)
             }
             withContext(Dispatchers.Default) {
                 val avis = response.reviews

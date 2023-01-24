@@ -63,7 +63,6 @@ class HomePageActivity : AppCompatActivity() {
                     if(game_id == "730") {
                         val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
                         games.add(game)
-                        val img = game_details.appid.data.headerImage
                     }
                     if(game_id == "578080"){
                         val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
@@ -133,8 +132,6 @@ class HomePageActivity : AppCompatActivity() {
 
             val intent = Intent(this, LikedActivity::class.java)
             startActivity(intent)
-            val database = Firebase.database
-            val myRef = database.getReference("message")
             true
         }
 
