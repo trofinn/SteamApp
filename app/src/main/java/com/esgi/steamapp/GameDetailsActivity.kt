@@ -59,8 +59,6 @@ class GameDetailsActivity : AppCompatActivity() {
             //onClick(findViewById<Button>(R.id.avis_button))
             replaceFragment(GameAvisFragment())
         }
-
-
     }
 
 

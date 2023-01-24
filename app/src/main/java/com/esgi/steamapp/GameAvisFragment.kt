@@ -7,17 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.esgi.steamapp.databinding.ActivityFavoriteBinding.inflate
+import com.esgi.steamapp.databinding.FragmentGameAvisBinding
+import com.esgi.steamapp.databinding.HomePageBinding
+import kotlinx.coroutines.*
+import java.lang.Runnable
 
 class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
 
     private val avis_list = mutableListOf<Avis>()
-    private val avis1 = Avis("gesco","text");
     private lateinit var recycler_view : RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,22 +36,36 @@ class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        avis_list.add(avis1)
-        avis_list.add(avis1)
-        avis_list.add(avis1)
-        avis_list.add(avis1)
-        avis_list.add(avis1)
 
-        recycler_view = view.findViewById(R.id.avis_list)
-        recycler_view.apply {
-            layoutManager = GridLayoutManager(activity,1)
-            adapter = AvisListAdapter(avis_list)
+        GlobalScope.launch(Dispatchers.Main) {
+            var progressbar = view.findViewById<ProgressBar>(R.id.progressbar)
+            var avis_list_rview = view.findViewById<RecyclerView>(R.id.avis_list)
+            progressbar.visibility = View.VISIBLE
+            avis_list_rview.visibility = View.INVISIBLE
+
+            val response = withContext(Dispatchers.Default) {
+                NetworkManagerAvisList.getListAvis("730")
+            }
+            withContext(Dispatchers.Default) {
+                val avis = response.reviews
+                for(i in avis) {
+                    avis_list.add(i)
+                    println("aaaaaaa ${i.review}")
+                }
+
+                activity?.runOnUiThread(java.lang.Runnable {
+                    recycler_view = view.findViewById(R.id.avis_list)
+                    recycler_view.apply {
+                        layoutManager = GridLayoutManager(activity,1)
+                        adapter = AvisListAdapter(avis_list)
+                    }
+                })
+            }
+            progressbar.visibility = View.INVISIBLE
+            avis_list_rview.visibility = View.VISIBLE
         }
     }
 }
-
-data class Avis(val author : String, val avis : String)
-
 
 class AvisListAdapter(val avis: MutableList<Avis>) : RecyclerView.Adapter<AvisViewHolder>() {
 
@@ -74,7 +93,7 @@ class AvisViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
 
     fun updateAvis(avis: Avis) {
-        utilisateur.text = avis.author
-        text.text = avis.avis
+        utilisateur.text = avis.author.steamid
+        text.text = avis.review
     }
 }
