@@ -6,12 +6,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.Adapter.GameAdapter
+import com.esgi.steamapp.GameAPI
+import com.esgi.steamapp.Network.GamesApi
 import com.esgi.steamapp.NetworkManagerGameDetails
 import com.esgi.steamapp.NetworkManagerGameList
+import com.esgi.steamapp.Overview.HomeViewModel
 import com.esgi.steamapp.R
 import com.esgi.steamapp.databinding.HomePageBinding
 import com.esgi.steamapp.model.Game
@@ -22,6 +27,8 @@ import com.esgi.steamapp.services.GameService
 import com.esgi.steamapp.services.ServiceBuilder
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,6 +52,7 @@ class HomePageActivity : AppCompatActivity() {
     lateinit var myGames: List<MyGames.Response.Rank>
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -52,6 +60,11 @@ class HomePageActivity : AppCompatActivity() {
         val binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        val homeViewModel: HomeViewModel by viewModels()
+
+
+
 
         //load game in recyclerView
         buildRecycleView()
@@ -213,23 +226,23 @@ class HomePageActivity : AppCompatActivity() {
 
 
     private fun loadGames() {
-        var gamesList: MutableList<Games> = mutableListOf()
+        var gamesList: MutableList<JsonElement> = mutableListOf()
         game_filtered = mutableListOf()
 
         var gameService: GameService
-        var requestCall: Call<Games>
+        var requestCall: Call<JsonObject>
 
          myGames.forEach {
              run {
                  gameService = ServiceBuilder.buildService2(GameService::class.java)
                  requestCall = gameService.getEachGame(it.appid)
 
-                 requestCall.enqueue(object : Callback<Games> {
+                 requestCall.enqueue(object : Callback<JsonObject> {
 
-                     override fun onResponse(call: Call<Games>, response: Response<Games>) {
+                     override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                          Log.d("Response", "onResponse: ${response.body()}")
                          if (response.isSuccessful) {
-                             gamesList.add(response.body()!!)
+                             gamesList.add(response.body()!!.get(it.appid.toString()))
 
                              Log.d("Response", "gamelist size : ${gamesList.size}")
 
@@ -242,7 +255,7 @@ class HomePageActivity : AppCompatActivity() {
                          }
                      }
 
-                     override fun onFailure(call: Call<Games>, t: Throwable) {
+                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                          Toast.makeText(
                              this@HomePageActivity,
                              "Something went wrong $t",
