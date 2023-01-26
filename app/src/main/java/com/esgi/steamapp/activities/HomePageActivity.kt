@@ -50,6 +50,7 @@ class HomePageActivity : AppCompatActivity() {
     lateinit var game_filtered : MutableList<Game>
     lateinit var games: MutableList<Game>
     lateinit var myGames: List<MyGames.Response.Rank>
+    lateinit var viewModel: HomeViewModel
 
 
 
@@ -61,7 +62,7 @@ class HomePageActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        val homeViewModel: HomeViewModel by viewModels()
+        val viewModel: HomeViewModel by viewModels()
 
 
 
@@ -70,8 +71,9 @@ class HomePageActivity : AppCompatActivity() {
         buildRecycleView()
 
         println("-------LOADING GAMES------- ")
-        loadMyGames()
+        //loadMyGames()
         //loadGames()
+        viewModel.getGames()
 
 
 
@@ -233,37 +235,36 @@ class HomePageActivity : AppCompatActivity() {
         var requestCall: Call<JsonObject>
 
          myGames.forEach {
-             run {
-                 gameService = ServiceBuilder.buildService2(GameService::class.java)
-                 requestCall = gameService.getEachGame(it.appid)
+             gameService = ServiceBuilder.buildService2(GameService::class.java)
+             requestCall = gameService.getEachGame(it.appid.toString())
 
-                 requestCall.enqueue(object : Callback<JsonObject> {
+             println("test")
+             requestCall.enqueue(object : Callback<JsonObject> {
 
-                     override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                         Log.d("Response", "onResponse: ${response.body()}")
-                         if (response.isSuccessful) {
-                             gamesList.add(response.body()!!.get(it.appid.toString()))
+                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                     Log.d("Response", "onResponse: ${response.body()}")
+                     if (response.isSuccessful) {
+                         gamesList.add(response.body()!!.get(it.appid.toString()))
 
-                             Log.d("Response", "gamelist size : ${gamesList.size}")
+                         Log.d("Response", "gamelist size : ${gamesList.size}")
 
-                         } else {
-                             Toast.makeText(
-                                 this@HomePageActivity,
-                                 "Something went wrong ${response.message()}",
-                                 Toast.LENGTH_SHORT
-                             ).show()
-                         }
-                     }
-
-                     override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                     } else {
                          Toast.makeText(
                              this@HomePageActivity,
-                             "Something went wrong $t",
+                             "Something went wrong ${response.message()}",
                              Toast.LENGTH_SHORT
                          ).show()
                      }
-                 })
-             }
+                 }
+
+                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                     Toast.makeText(
+                         this@HomePageActivity,
+                         "Something went wrong $t",
+                         Toast.LENGTH_LONG
+                     ).show()
+                 }
+             })
          }
 
 
@@ -276,7 +277,7 @@ class HomePageActivity : AppCompatActivity() {
 
         //initiate the service
         val gameService  = ServiceBuilder.buildService(GameService::class.java)
-        val requestCall = gameService.getMostPlayedGames("ISteamChartsService/GetMostPlayedGames/v1/")
+        val requestCall = gameService.getMostPlayedGames()
 
 
 
@@ -288,7 +289,7 @@ class HomePageActivity : AppCompatActivity() {
                 if (response.isSuccessful){
                   myGames  = response.body()!!.response.ranks
 
-                    Log.d("Response", "gamelist size : ${myGames.size}")
+                    Log.d("Response", "myGames size : ${myGames.size}")
 
                 }else{
                     Toast.makeText(this@HomePageActivity, "Something went wrong ${response.message()}", Toast.LENGTH_SHORT).show()
@@ -296,7 +297,7 @@ class HomePageActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<MyGames>, t: Throwable) {
-                Toast.makeText(this@HomePageActivity, "Something went wrong $t", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@HomePageActivity, "Something went wrong $t", Toast.LENGTH_LONG).show()
             }
         })
     }

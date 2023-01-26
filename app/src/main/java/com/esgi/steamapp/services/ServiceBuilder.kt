@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object ServiceBuilder {
 
     private const val URL = "https://api.steampowered.com/"
-    private var URL2 = "https://store.steampowered.com/api/appdetails?appids="
+    private var URL2 = "https://store.steampowered.com/"
 
     //Create client
     private val okHttp = OkHttpClient.Builder()

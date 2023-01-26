@@ -1,6 +1,7 @@
 package com.esgi.steamapp.Network
 
 import com.esgi.steamapp.model.Games
+import com.esgi.steamapp.model.MyGames
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -15,8 +16,8 @@ private val retrofit = Retrofit.Builder()
 
 interface GamesAPiService {
 
-    @GET("games")
-    suspend fun getSteamGames(@Query("endpoint") endpoint: String): List<Games>
+    @GET("/ISteamChartsService/GetMostPlayedGames/v1/")
+    suspend fun getSteamGames(): List<MyGames>
 }
 
 object GamesApi {

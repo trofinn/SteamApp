@@ -25,15 +25,14 @@ class HomeViewModel: ViewModel() {
      * Gets Mars photos information from the Mars API Retrofit service and updates the
      *
      */
-    private fun getGames() {
+     fun getGames() {
         viewModelScope.launch {
-            /*try {
+            try {
                 val listResult = GamesApi.retrofitService.getSteamGames()
-                _status.value = "Success: ${listResult.size} Mars photos retrieved"
+                _status.value = "--------------Success: ${listResult.size} Mars photos retrieved"
             } catch (e: Exception) {
                 _status.value = "Failure: ${e.message}"
             }
-             */
         }
     }
 }

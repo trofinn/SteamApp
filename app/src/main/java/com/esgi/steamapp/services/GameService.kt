@@ -11,9 +11,9 @@ import retrofit2.http.Query
 
 interface GameService {
 
-    @GET("mygames")
-    fun getMostPlayedGames(@Path("endpoint") endpoint: String): Call<MyGames>
+    @GET("/ISteamChartsService/GetMostPlayedGames/v1/")
+    fun getMostPlayedGames(): Call<MyGames>
 
-    @GET("game")
-    fun getEachGame(@Query("appids") appids: Int): Call<JsonObject>
+    @GET("/api/appdetails")
+    fun getEachGame(@Query("appids") appids: String): Call<JsonObject>
 }
