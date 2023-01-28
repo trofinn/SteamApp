@@ -7,13 +7,10 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.Adapter.GameAdapter
-import com.esgi.steamapp.GameAPI
-import com.esgi.steamapp.Network.GamesApi
 import com.esgi.steamapp.NetworkManagerGameDetails
 import com.esgi.steamapp.NetworkManagerGameList
 import com.esgi.steamapp.Overview.HomeViewModel
@@ -22,22 +19,18 @@ import com.esgi.steamapp.databinding.HomePageBinding
 import com.esgi.steamapp.model.Game
 import com.esgi.steamapp.model.Games
 import com.esgi.steamapp.model.MyGames
-import com.esgi.steamapp.model.Rank
+import com.esgi.steamapp.network1.GameRetriever
 import com.esgi.steamapp.services.GameService
 import com.esgi.steamapp.services.ServiceBuilder
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit.Builder
-import java.net.URL
 import java.util.*
 
 class HomePageActivity : AppCompatActivity() {
@@ -47,10 +40,10 @@ class HomePageActivity : AppCompatActivity() {
     lateinit var adapter: GameAdapter
     var list_of_game_ids : MutableList<Int> = emptyList<Int>().toMutableList()
     var that = this
-    lateinit var game_filtered : MutableList<Game>
-    lateinit var games: MutableList<Game>
+     var game_filtered : MutableList<Games.Result.Data> = mutableListOf()
+    var games: MutableList<Games.Result.Data> = mutableListOf()
     lateinit var myGames: List<MyGames.Response.Rank>
-    lateinit var viewModel: HomeViewModel
+    val gameRetriever: GameRetriever = GameRetriever()
 
 
 
@@ -68,12 +61,10 @@ class HomePageActivity : AppCompatActivity() {
 
 
         //load game in recyclerView
-        buildRecycleView()
+        //buildRecycleView()
 
         println("-------LOADING GAMES------- ")
-        //loadMyGames()
-        //loadGames()
-        viewModel.getGames()
+        fetchGames()
 
 
 
@@ -115,11 +106,6 @@ class HomePageActivity : AppCompatActivity() {
 
     }
 
-    private fun fetchGames(): Thread {
-        return Thread{
-            val url = URL("")
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -175,7 +161,7 @@ class HomePageActivity : AppCompatActivity() {
             image = "https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1668125812")
         val game1 = Game(name = "test", editeur = "Gesco", prix = "10,00 $",
             image = "https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1668125812")
-        games.add(game)
+       /* games.add(game)
 
         games.add(game1)
         games.add(game)
@@ -194,6 +180,8 @@ class HomePageActivity : AppCompatActivity() {
 
         recycler_view.adapter = GameAdapter(game_filtered, this)
 
+        */
+
     }
 
 
@@ -204,7 +192,7 @@ class HomePageActivity : AppCompatActivity() {
         if (searchText.isNotEmpty()) {
 
             games.forEach {
-                if (it.name.toLowerCase().contains(newText)) {
+                if (it.name.toLowerCase().contains(searchText)) {
                     game_filtered.add(it)
                 }
             }
@@ -227,14 +215,17 @@ class HomePageActivity : AppCompatActivity() {
     }
 
 
+
+
     private fun loadGames() {
         var gamesList: MutableList<JsonElement> = mutableListOf()
         game_filtered = mutableListOf()
 
         var gameService: GameService
         var requestCall: Call<JsonObject>
-
+        println("TEST -------myGames.size")
          myGames.forEach {
+             println("------------ TEST -----------")
              gameService = ServiceBuilder.buildService2(GameService::class.java)
              requestCall = gameService.getEachGame(it.appid.toString())
 
@@ -287,7 +278,7 @@ class HomePageActivity : AppCompatActivity() {
             override fun onResponse(call: Call<MyGames>, response: Response<MyGames>) {
                 Log.d("Response", "onResponse: ${response.body()}")
                 if (response.isSuccessful){
-                  myGames  = response.body()!!.response.ranks
+                    myGames  = response.body()!!.response.ranks
 
                     Log.d("Response", "myGames size : ${myGames.size}")
 
@@ -302,7 +293,44 @@ class HomePageActivity : AppCompatActivity() {
         })
     }
 
+    private fun fetchGames() {
+        val gamesFetchJob = Job()
+        val errorHandler = CoroutineExceptionHandler  {
+            coroutineContext, throwable ->
+            throwable.printStackTrace()
+            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show()
         }
+
+        val scope = CoroutineScope(gamesFetchJob + Dispatchers.IO)
+        val mapper = Gson()
+        var mydata : Games.Result.Data
+        var myresult: JsonElement
+        scope.launch(errorHandler) {
+            val deferred = async {gameRetriever.getMostPlayedGames().response.ranks }
+            myGames = deferred.await()
+            Log.d("--------Response", "gameList size : ${myGames.size}")
+            var deferred2 : Deferred<JsonObject>
+            myGames = myGames.subList(0, 10)
+            myGames.forEach {
+                deferred2 = async { gameRetriever.getAGame(it.appid.toString()) }
+                myresult = deferred2.await().get(it.appid.toString())
+                println(myresult.get("data"))
+                mydata = mapper.fromJson(myresult.getAsJsonObject("data"), Games.Result.Data::class.java)
+                println(mydata)
+                games.add(mydata)
+            }
+            Log.d("-----NEW Response", "games size : ${games.size}")
+
+        }
+
+    }
+
+    private fun renderData(gameMist: MyGames) {
+    }
+
+        }
+
+
 
 
 

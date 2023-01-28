@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.esgi.steamapp.Adapter.GameAdapter
 import com.esgi.steamapp.R
 import com.esgi.steamapp.model.Game
+import com.esgi.steamapp.model.Games
 
 class LikedActivity : AppCompatActivity() {
     lateinit var recycler_view : RecyclerView
@@ -18,10 +19,10 @@ class LikedActivity : AppCompatActivity() {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.close)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val games = mutableListOf<Game>()
+        val games = mutableListOf<Games.Result.Data>()
 
         val game = Game(name = "Counter Strike", editeur = "Gesco", prix = "10,00 $", image = "https://cdn.akamai.steamstatic.com/steam/apps/730/header.jpg?t=1668125812")
-        games.add(game)
+        //games.add(game)
 
         recycler_view = findViewById(R.id.game_list)
         recycler_view.apply{

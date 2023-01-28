@@ -1,5 +1,6 @@
 package com.esgi.steamapp.Overview
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,8 @@ class HomeViewModel: ViewModel() {
         getGames()
     }
 
+
+
     /**
      * Gets Mars photos information from the Mars API Retrofit service and updates the
      *
@@ -30,6 +33,7 @@ class HomeViewModel: ViewModel() {
             try {
                 val listResult = GamesApi.retrofitService.getSteamGames()
                 _status.value = "--------------Success: ${listResult.size} Mars photos retrieved"
+                println(_status.value)
             } catch (e: Exception) {
                 _status.value = "Failure: ${e.message}"
             }

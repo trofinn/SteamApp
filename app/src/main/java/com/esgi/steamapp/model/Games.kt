@@ -1,9 +1,9 @@
 package com.esgi.steamapp.model
 
 data class Games(
-    val `431960`: X431960
+    val `431960`: Result
 ) {
-    data class X431960(
+    data class Result(
         val `data`: Data,
         val success: Boolean
     ) {
@@ -41,6 +41,8 @@ data class Games(
             val supported_languages: String,
             val type: String,
             val website: String
+
+
         ) {
             data class Achievements(
                 val highlighted: List<Highlighted>,
@@ -147,6 +149,11 @@ data class Games(
                 val email: String,
                 val url: String
             )
+
+            override fun toString(): String {
+                return "Data(name='$name',publishers=$publishers,steam_appid=$steam_appid," +
+                        " website='$website')"
+            }
         }
     }
 }
