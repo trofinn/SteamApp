@@ -52,6 +52,7 @@ data class Games(
     val appid : GameDetails,
     @SerializedName("578080")
     val appid2 : GameDetails,
+
 )
 
 data class GameDetails(

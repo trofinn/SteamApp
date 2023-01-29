@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:id="@+id/progressbar"/>
 
-    <EditText
+    <androidx.appcompat.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -47,18 +47,6 @@
         android:layout_marginStart="10dp"
         app:cardCornerRadius="30dp"
         app:cardElevation="15dp" />
-
-    <ImageButton
-        android:id="@+id/search_button"
-        android:padding="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/close"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="@null"
-        app:layout_constraintTop_toTopOf="@id/search_bar"
-        app:layout_constraintEnd_toEndOf="@id/search_bar"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardview"
@@ -112,10 +100,12 @@
                 android:fontFamily="@font/google_sans_regular"
                 android:textColor="@color/grey"/>
 
+
             <TextView
+                android:id="@+id/big_game_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Counter-Strike \nGlobal Offensive"
+                android:text="Counter-Strike: Global Offensive"
                 android:textSize="25sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/description"

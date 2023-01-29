@@ -1,8 +1,10 @@
 package com.esgi.steamapp
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -15,14 +17,12 @@ import androidx.fragment.app.replace
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.databinding.GameDetailsLayoutBinding
 import com.esgi.steamapp.databinding.HomePageBinding
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import org.w3c.dom.Text
+import retrofit2.http.Tag
 
 class GameDetailsActivity : AppCompatActivity() {
     private lateinit var game_name : TextView
@@ -31,7 +31,7 @@ class GameDetailsActivity : AppCompatActivity() {
     private lateinit var game_photo : ImageView
     private lateinit var game_description : TextView
     private lateinit var game_id : String
-    private lateinit var database : DatabaseReference
+    private lateinit var database : FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +39,9 @@ class GameDetailsActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app").getReference()
+        database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
         game_name = findViewById(R.id.nom)
-        game_editor = findViewById(R.id.editeur)
+        game_editor = findViewById(R.id.editeur2)
         game_photo = findViewById(R.id.image)
         game_description = findViewById(R.id.data_transition_view)
 
@@ -80,38 +80,74 @@ class GameDetailsActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.elements, menu)
+        val database_likes = database.getReference().child("Likes")
+        val database_favorites = database.getReference().child("Favorites")
+        database_likes.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.child(game_id).exists()) {
+                    menu.getItem(0).setIcon(R.drawable.like_full)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+
+        })
+        database_favorites.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.child(game_id).exists()) {
+                    menu.getItem(1).setIcon(R.drawable.whishlist_full)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
         return true
     }
-    private var ok_like = 1
-    private var ok_favorite = 1
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.like -> {
-            val reference = database.child("Likes").child(game_id)
-            if(ok_like == 1) {
-                item.setIcon(R.drawable.like_full)
-                reference.setValue(game_id)
-                ok_like = 0
+            val database_likes = database.getReference().child("Likes")
+            val eventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(!snapshot.exists()) {
+                        item.setIcon(R.drawable.like_full)
+                        database_likes.child(game_id).child("name").setValue(game_name.text)
+                        database_likes.child(game_id).child("dev").setValue(game_editor.text)
+                        database_likes.child(game_id).child("photo").setValue(game_photo_link)
+                        database_likes.child(game_id).child("description").setValue(game_description.text)
+                    }
+                    else {
+                        item.setIcon(R.drawable.like)
+                        database_likes.child(game_id).removeValue()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, error.getMessage());
+                }
             }
-            else {
-                reference.child("Likes").child(game_id).removeValue()
-                item.setIcon(R.drawable.like)
-                ok_like = 1
-            }
+            database_likes.child(game_id).addListenerForSingleValueEvent(eventListener)
             true
         }
 
         R.id.favorite -> {
-            val reference = database.child("Favorites").child(game_id)
-            if(ok_favorite == 1) {
-                item.setIcon(R.drawable.whishlist_full)
-                reference.setValue(game_id)
-                ok_favorite = 0
+            val database_favorites = database.getReference().child("Favorites")
+            val eventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if(!snapshot.exists()) {
+                        item.setIcon(R.drawable.whishlist_full)
+                        database_favorites.child(game_id).child("name").setValue(game_name.text)
+                        database_favorites.child(game_id).child("dev").setValue(game_editor.text)
+                        database_favorites.child(game_id).child("photo").setValue(game_photo_link)
+                        database_favorites.child(game_id).child("description").setValue(game_description.text)
+                    }
+                    else {
+                        item.setIcon(R.drawable.whishlist)
+                        database_favorites.child(game_id).removeValue()
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, error.getMessage());
+                }
             }
-            else {
-                reference.child("Favorites").child(game_id).removeValue()
-                item.setIcon(R.drawable.whishlist)
-                ok_favorite = 1
-            }
+            database_favorites.child(game_id).addListenerForSingleValueEvent(eventListener)
             true
         }
         else -> {

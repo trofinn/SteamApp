@@ -58,7 +58,7 @@
             android:scaleType="centerInside"/>
 
         <TextView
-            android:id="@+id/editeur"
+            android:id="@+id/editeur2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/google_sans_regular"
@@ -79,7 +79,7 @@
             android:textColor="@color/grey"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@id/mini_image"
-            app:layout_constraintBottom_toTopOf="@id/editeur"
+            app:layout_constraintBottom_toTopOf="@id/editeur2"
             android:layout_marginStart="10dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

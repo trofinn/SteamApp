@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,6 +25,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
+import java.util.Locale.filter
 
 
 class HomePageActivity : AppCompatActivity() {
@@ -32,10 +35,12 @@ class HomePageActivity : AppCompatActivity() {
     lateinit var recycler_view : RecyclerView
     var list_of_game_ids : MutableList<Int> = emptyList<Int>().toMutableList()
     val games = mutableListOf<Game>()
+    val games_map = mutableMapOf<String, Game>()
     var list_of_game_ids_test : MutableList<String> = emptyList<String>().toMutableList()
-
+    var game_filtered = mutableListOf<Game>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         val binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -44,6 +49,7 @@ class HomePageActivity : AppCompatActivity() {
         list_of_game_ids_test.add("730")
         list_of_game_ids_test.add("578080");
 
+        val searchView = findViewById<SearchView>(R.id.search_bar)
 
         GlobalScope.launch(Dispatchers.Main) {
             binding.progressbar.visibility = View.VISIBLE
@@ -57,44 +63,41 @@ class HomePageActivity : AppCompatActivity() {
                 list_of_game_ids.add(i.appid)
             }
 
-            withContext(Dispatchers.Default) {
+            withContext(Dispatchers.Main) {
                 for(game_id in list_of_game_ids_test) {
                     val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
                     if(game_id == "730") {
                         val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
                         games.add(game)
+                        games_map.set(game_id,game)
                     }
                     if(game_id == "578080"){
                         val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
                         games.add(game)
+                        games_map.set(game_id,game)
                     }
                 }
-                runOnUiThread(java.lang.Runnable {
-                    recycler_view = findViewById(R.id.game_list)
-                    recycler_view.apply{
-                        layoutManager = GridLayoutManager(this@HomePageActivity,1);
-                        adapter = ListAdapter(games, object : OnProductListener {
-                            override fun onClicked(game : Game, position : Int) {
-                                Toast.makeText(
-                                    this@HomePageActivity,
-                                    "Game $position clicked",
-                                    Toast.LENGTH_SHORT).show();
-                                val intent = Intent(this@HomePageActivity,GameDetailsActivity::class.java)
-                                intent.putExtra("game_name", game.name)
-                                intent.putExtra("game_editor", game.editeur)
-                                intent.putExtra("game_image", game.image)
-                                intent.putExtra("game_id", list_of_game_ids_test[position])
-                                intent.putExtra("game_description", game.description)
-                                startActivity(intent)
-                            }
-                        });
+                recycler_view = findViewById(R.id.game_list)
+                buildRecyclerView(recycler_view,games_map,this@HomePageActivity)
+
+            }
+            binding.progressbar.visibility = View.GONE
+            binding.gameList.visibility = View.VISIBLE
+            withContext(Dispatchers.Default) {
+                searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        return false
+                    }
+
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        filter(newText!!)
+                        return false
                     }
                 })
             }
-
-            binding.progressbar.visibility = View.GONE
-            binding.gameList.visibility = View.VISIBLE
         }
+
+
 
         /*
         GlobalScope.launch(Dispatchers.Main) {
@@ -115,7 +118,38 @@ class HomePageActivity : AppCompatActivity() {
         more_info_button = findViewById(R.id.button)
         more_info_button.setOnClickListener() {
             val intent = Intent(this, GameDetailsActivity::class.java)
+            intent.putExtra("game_name", binding.bigGameName.text)
+            intent.putExtra("game_editor", "[Valve, Hidden Path Entertainment]")
+            intent.putExtra("game_image", url)
+            intent.putExtra("game_id", "730")
+            intent.putExtra("game_description", binding.description.text)
             startActivity(intent)
+        }
+    }
+    private fun filter(newText: String) {
+        game_filtered.clear()
+        val searchText = newText!!.toLowerCase(Locale.getDefault())
+        if (searchText.isNotEmpty()) {
+
+            games.forEach {
+                if (it.name.toLowerCase().contains(searchText)) {
+                    game_filtered.add(it)
+                }
+            }
+
+            if (game_filtered.isEmpty()) {
+                Toast.makeText(applicationContext, "No Data Found..",
+                    Toast.LENGTH_SHORT).show()
+            }
+            else {
+                recycler_view.adapter!!.notifyDataSetChanged()
+            }
+
+        }
+        else {
+            game_filtered.clear()
+            game_filtered.addAll(games)
+            recycler_view.adapter!!.notifyDataSetChanged()
         }
     }
 

@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:src="@drawable/empty_whishlist"
-        android:id="@+id/empty_starts"/>
+        android:id="@+id/empty_stars"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
