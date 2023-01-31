@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/signInFragment">
+
+    <fragment
+        android:id="@+id/homePageFragment"
+        android:name="com.esgi.steamapp.HomePageFragment"
+        android:label="HomePageFragment" >
+        <action
+            android:id="@+id/action_homePageFragment_to_gameDetailsFragment"
+            app:destination="@id/gameDetailsFragment" />
+        <argument
+            android:name="game_name"
+            app:argType="string" />
+        <argument
+            android:name="game_editor"
+            app:argType="string" />
+        <argument
+            android:name="game_image"
+            app:argType="string" />
+        <argument
+            android:name="game_id"
+            app:argType="string" />
+        <argument
+            android:name="game_description"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_homePageFragment_to_likedGamesFragment"
+            app:destination="@id/likedGamesFragment"
+            app:launchSingleTop="false" />
+        <action
+            android:id="@+id/action_homePageFragment_to_favoriteGamesFragment"
+            app:destination="@id/favoriteGamesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameDetailsFragment"
+        android:name="com.esgi.steamapp.GameDetailsFragment"
+        android:label="GameDetailsFragment" >
+        <argument
+            android:name="game_name"
+            app:argType="string" />
+        <argument
+            android:name="game_editor"
+            app:argType="string" />
+        <argument
+            android:name="game_image"
+            app:argType="string" />
+        <argument
+            android:name="game_id"
+            app:argType="string" />
+        <argument android:name="game_description" />
+        <action
+            android:id="@+id/action_gameDetailsFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment"
+            app:popUpTo="@id/homePageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/likedGamesFragment"
+        android:name="com.esgi.steamapp.LikedGamesFragment"
+        android:label="fragment_liked_games"
+        tools:layout="@layout/fragment_liked_games" >
+        <action
+            android:id="@+id/action_likedGamesFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment"
+            app:popUpTo="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_likedGamesFragment_to_gameDetailsFragment"
+            app:destination="@id/gameDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoriteGamesFragment"
+        android:name="com.esgi.steamapp.FavoriteGamesFragment"
+        android:label="fragment_favorite_games"
+        tools:layout="@layout/fragment_favorite_games" >
+        <action
+            android:id="@+id/action_favoriteGamesFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment"
+            app:popUpTo="@id/gameDetailsFragment" />
+        <action
+            android:id="@+id/action_favoriteGamesFragment_to_gameDetailsFragment"
+            app:destination="@id/gameDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.esgi.steamapp.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in" >
+        <action
+            android:id="@+id/action_signInFragment_to_homePageFragment"
+            app:destination="@id/homePageFragment" />
+        <action
+            android:id="@+id/action_signInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_signInFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.esgi.steamapp.SignUpFragment"
+        android:label="fragment_sign_up"
+        tools:layout="@layout/fragment_sign_up" >
+        <action
+            android:id="@+id/action_signUpFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.esgi.steamapp.ForgotPasswordFragment"
+        android:label="fragment_forgot_password"
+        tools:layout="@layout/fragment_forgot_password" >
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+    </fragment>
+</navigation>

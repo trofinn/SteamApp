@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GameDetailsFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dark_grey">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/dark_grey"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="Detail du jeu"
+            app:titleTextColor="@color/grey"
+            style="@style/ToolbarTheme"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/data_transition_view"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:src="@drawable/background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/image"
+            app:layout_constraintTop_toBottomOf="@id/image"
+            android:id="@+id/mini_layout"
+            android:background="@drawable/background"
+            android:layout_margin="20dp"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="1dp">
+
+            <ImageView
+                android:id="@+id/mini_image"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:layout_margin="15dp"
+                app:layout_constraintBottom_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:scaleType="centerInside"/>
+
+            <TextView
+                android:id="@+id/editeur2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/google_sans_regular"
+                android:text="Editeur"
+                android:textColor="@color/grey"
+                android:textSize="10sp"
+                app:layout_constraintStart_toEndOf="@id/mini_image"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="10dp"/>
+
+            <TextView
+                android:id="@+id/nom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/google_sans_regular"
+                android:text="Nom"
+                android:textColor="@color/grey"
+                android:textSize="15sp"
+                app:layout_constraintStart_toEndOf="@id/mini_image"
+                app:layout_constraintBottom_toTopOf="@id/editeur2"
+                android:layout_marginStart="10dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/description_button"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mini_layout"
+            app:layout_constraintEnd_toStartOf="@id/guideline"
+            android:text="DESCRIPTION"
+            android:textSize="10sp"
+            android:fontFamily="@font/google_sans_regular"
+            android:textColor="@color/grey"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="1dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/button"/>
+
+        <Button
+            android:id="@+id/avis_button"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/mini_layout"
+            android:text="AVIS"
+            android:textSize="10sp"
+            android:fontFamily="@font/google_sans_regular"
+            android:textColor="@color/grey"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="1dp"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/dark_grey"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/guideline"
+            app:layout_constraintGuide_percent="0.5"
+            android:padding="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"/>
+
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/description_button"
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginTop="5dp"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

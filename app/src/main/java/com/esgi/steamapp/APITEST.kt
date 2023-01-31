@@ -85,3 +85,68 @@ object NetworkManagerGameDetails {
     }
 }
 
+/*
+data class SteamResponse(val game: SteamGameResponse)
+
+data class SteamGameResponse(
+    val success: Boolean,
+    val data: SteamGameResponseData?
+)
+
+data class SteamGameResponseData(
+    val type: String,
+    val name: String,
+)
+
+interface SteamAPI {
+    @GET("appdetails")
+    fun getGameById(@Query("appids") id: String): Deferred<SteamResponse>
+}
+
+object NetworkRequest {
+
+    private val api = Retrofit.Builder()
+        .baseUrl("https://store.steampowered.com/api/")
+        .addConverterFactory(
+            GsonConverterFactory.create(
+                GsonBuilder()
+                    .registerTypeAdapter(SteamResponse::class.java, SteamResponseDeserializer())
+                    .create()
+            )
+        )
+        .addCallAdapterFactory(CoroutineCallAdapterFactory())
+        .build()
+        .create(SteamAPI::class.java)
+
+
+    suspend fun getGame(id: String): SteamResponse {
+        return api.getGameById(id).await()
+    }
+
+}
+
+class SteamResponseDeserializer : JsonDeserializer<SteamResponse> {
+
+    companion object {
+        val deserializer: Gson = GsonBuilder().create()
+    }
+
+    override fun deserialize(
+        json: JsonElement?,
+        typeOfT: Type?,
+        context: JsonDeserializationContext?
+    ): SteamResponse {
+        // On récupère le JSON
+        val jsonObject = json?.asJsonObject
+
+        // On récupère la clé du premier élément du json (ex : "578080") qui est un entier
+        val key = jsonObject?.keySet()?.first { it.toIntOrNull() != null }
+
+        return SteamResponse(
+            deserializer.fromJson(
+                jsonObject?.get(key), SteamGameResponse::class.java
+            )
+        )
+    }
+}
+ */
