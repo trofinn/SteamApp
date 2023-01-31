@@ -1,10 +1,13 @@
 package com.esgi.steamapp
 
+import android.widget.Toast
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -81,3 +84,4 @@ object NetworkManagerGameDetails {
         return api.getDetailsOfGame(appid).await()
     }
 }
+

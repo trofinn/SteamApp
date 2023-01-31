@@ -37,7 +37,7 @@ class HomePageActivity : AppCompatActivity() {
     val games = mutableListOf<Game>()
     val games_map = mutableMapOf<String, Game>()
     var list_of_game_ids_test : MutableList<String> = emptyList<String>().toMutableList()
-    var game_filtered = mutableListOf<Game>()
+    var game_filtered = mutableMapOf<String, Game>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,7 +45,7 @@ class HomePageActivity : AppCompatActivity() {
         val binding = HomePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(findViewById(R.id.toolbar))
-
+        recycler_view = findViewById(R.id.game_list)
         list_of_game_ids_test.add("730")
         list_of_game_ids_test.add("578080");
 
@@ -63,41 +63,37 @@ class HomePageActivity : AppCompatActivity() {
                 list_of_game_ids.add(i.appid)
             }
 
-            withContext(Dispatchers.Main) {
-                for(game_id in list_of_game_ids_test) {
-                    val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
-                    if(game_id == "730") {
-                        val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
-                        games.add(game)
-                        games_map.set(game_id,game)
-                    }
-                    if(game_id == "578080"){
-                        val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
-                        games.add(game)
-                        games_map.set(game_id,game)
-                    }
+            for(game_id in list_of_game_ids_test) {
+                val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
+                if(game_id == "730") {
+                    val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
+                    games.add(game)
+                    games_map.set(game_id,game)
                 }
-                recycler_view = findViewById(R.id.game_list)
-                buildRecyclerView(recycler_view,games_map,this@HomePageActivity)
-
+                if(game_id == "578080"){
+                    val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
+                    games.add(game)
+                    games_map.set(game_id,game)
+                }
             }
-            binding.progressbar.visibility = View.GONE
-            binding.gameList.visibility = View.VISIBLE
-            withContext(Dispatchers.Default) {
-                searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return false
-                    }
-
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        filter(newText!!)
-                        return false
-                    }
-                })
+        }.invokeOnCompletion {
+            if(it == null) {
+                buildRecyclerView(recycler_view,games_map,this@HomePageActivity)
+                binding.progressbar.visibility = View.GONE
+                binding.gameList.visibility = View.VISIBLE
             }
         }
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
 
-
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val new_games_list = filter(newText!!)
+                buildRecyclerView(recycler_view,new_games_list,this@HomePageActivity)
+                return false
+            }
+        })
 
         /*
         GlobalScope.launch(Dispatchers.Main) {
@@ -126,14 +122,14 @@ class HomePageActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-    private fun filter(newText: String) {
+    private fun filter(newText: String) : MutableMap<String, Game>{
         game_filtered.clear()
-        val searchText = newText!!.toLowerCase(Locale.getDefault())
+        val searchText = newText!!.lowercase(Locale.getDefault())
         if (searchText.isNotEmpty()) {
 
-            games.forEach {
-                if (it.name.toLowerCase().contains(searchText)) {
-                    game_filtered.add(it)
+            games_map.forEach {
+                if (it.value.name.lowercase(Locale.getDefault()).contains(searchText)) {
+                    game_filtered.set(it.key,it.value)
                 }
             }
 
@@ -148,9 +144,10 @@ class HomePageActivity : AppCompatActivity() {
         }
         else {
             game_filtered.clear()
-            game_filtered.addAll(games)
+            game_filtered = games_map
             recycler_view.adapter!!.notifyDataSetChanged()
         }
+        return game_filtered
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -235,5 +232,4 @@ interface OnProductListener {
     fun onClicked(game : Game, position : Int) {
 
     }
-
 }
