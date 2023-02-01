@@ -23,8 +23,8 @@ class GameDescriptionFragment : Fragment(R.layout.fragment_game_description) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = inflater.inflate(R.layout.fragment_game_description, container, false)
         description = view.findViewById(R.id.description)
-        val game_description = arguments?.getString("game_description")
-        description.text = game_description
+        val gameDescription = arguments?.getString("game_description")
+        description.text = gameDescription
         return view
     }
 

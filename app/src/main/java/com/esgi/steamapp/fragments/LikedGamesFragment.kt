@@ -19,8 +19,8 @@ import com.google.firebase.database.ValueEventListener
 
 
 class LikedGamesFragment : Fragment() {
-    lateinit var recycler_view : RecyclerView
-    lateinit var empty_likes : ImageView
+    lateinit var recyclerView : RecyclerView
+    lateinit var emptyLikes : ImageView
     private lateinit var database : FirebaseDatabase
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -32,7 +32,7 @@ class LikedGamesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
-        recycler_view = view.findViewById(R.id.game_list)
+        recyclerView = view.findViewById(R.id.game_list)
 
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -43,13 +43,13 @@ class LikedGamesFragment : Fragment() {
             }
         })
         getGamesFromDatabase(object : GameListCallback {
-            override fun onCallback(games_map: MutableMap<String, Game>) {
-                val games_list = games_map.values.toMutableList()
-                recycler_view.apply{
+            override fun onCallback(gamesMap: MutableMap<String, Game>) {
+                val gamesList = gamesMap.values.toMutableList()
+                recyclerView.apply{
                     layoutManager = GridLayoutManager(context,1)
-                    adapter = ListAdapter(games_list, object : OnProductListener {
+                    adapter = ListAdapter(gamesList, object : OnProductListener {
                         override fun onClicked(game : Game, position : Int) {
-                            val key = getKey(games_map,game)
+                            val key = getKey(gamesMap,game)
                             findNavController().navigate(
                                 LikedGamesFragmentDirections.actionLikedGamesFragmentToGameDetailsFragment(
                                     game.name,
@@ -60,10 +60,10 @@ class LikedGamesFragment : Fragment() {
                         }
                     })
                 }
-                empty_likes = view.findViewById(R.id.empty_likes)
-                empty_likes.visibility = View.GONE
-                if(games_list.isEmpty()) {
-                    empty_likes.visibility = View.VISIBLE
+                emptyLikes = view.findViewById(R.id.empty_likes)
+                emptyLikes.visibility = View.GONE
+                if(gamesList.isEmpty()) {
+                    emptyLikes.visibility = View.VISIBLE
                 }
             }
         },"Likes")
@@ -91,7 +91,6 @@ fun getGamesFromDatabase(myCallback: GameListCallback, reference : String) {
         override fun onDataChange(snapshot: DataSnapshot) {
             for (child : DataSnapshot in snapshot.children) {
                 val key = child.key
-                val value = child.getValue().toString()
                 val game = Game(child.child("name").getValue().toString(),child.child("dev").getValue().toString(),"", child.child("photo").getValue().toString(), child.child("description").getValue().toString())
                 games.set(key.toString(), game)
             }
