@@ -3,6 +3,7 @@ package com.esgi.steamapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -14,10 +15,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.databinding.HomePageBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.esgi.steamapp.model.Games
+import com.esgi.steamapp.model.MyGames
+import com.esgi.steamapp.service.GameRetriever
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import kotlinx.coroutines.*
 import java.util.*
 
 
@@ -30,6 +33,9 @@ class HomePageFragment : Fragment() {
     val games_map = mutableMapOf<String, Game>()
     var list_of_game_ids_test : MutableList<String> = emptyList<String>().toMutableList()
     var game_filtered = mutableMapOf<String, Game>()
+
+    var rankList : MutableList<MyGames.Response.Rank> = mutableListOf()
+    var theGames : MutableList<JsonObject> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -59,20 +65,47 @@ class HomePageFragment : Fragment() {
             for (i in api_games) {
                 list_of_game_ids.add(i.appid)
             }
+            list_of_game_ids = list_of_game_ids.subList(0, 15)
+            var game_details: JsonObject
+            var gameRetriever = GameRetriever()
+            var deferred: Deferred<JsonObject>
+            withContext(Dispatchers.Default) {
+                for(game_id in list_of_game_ids) {
+                    deferred = async { gameRetriever.getAGame(game_id.toString()) }
+                    game_details = deferred.await().get(game_id.toString()).asJsonObject
+                        .getAsJsonObject("data")
 
-            for(game_id in list_of_game_ids_test) {
-                val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
-                if(game_id == "730") {
-                    val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
+                    val game = Game(
+                        name = game_details.get("name").asString,
+                        editeur = game_details.get("publishers").asJsonArray.get(0).asString
+                        , prix = if (game_details.get("price_overview") != null)
+                    game_details.get("price_overview").asJsonObject.get("initial_formatted").asString else
+                    "free",
+                        image = game_details.get("header_image").asString,
+                        description = game_details.get("short_description").asString)
+                    println(game)
                     games.add(game)
-                    games_map.set(game_id,game)
-                }
-                if(game_id == "578080"){
-                    val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
-                    games.add(game)
-                    games_map.set(game_id,game)
+                    games_map.set(game_id.toString(),game)
+                    /*val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
+
+                    if(game_id == "730") {
+                        val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
+                        games.add(game)
+                        games_map.set(game_id,game)
+                    }
+                    if(game_id == "578080"){
+                        val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
+                        games.add(game)
+                        games_map.set(game_id,game)
+                    }
+
+                     */
                 }
             }
+            Log.d("--------Response", "gameList size : ${list_of_game_ids.size}")
+
+
+
             buildRecyclerView(recycler_view,games_map,requireContext())
             view.findViewById<ProgressBar>(R.id.progressbar).visibility = View.GONE
             recycler_view.visibility = View.VISIBLE
@@ -118,6 +151,37 @@ class HomePageFragment : Fragment() {
                     url,
                     "730",
                     view.findViewById<TextView>(R.id.description).text.toString()))
+        }
+
+    }
+    private fun fetchGames() {
+        val gamesFetchJob = Job()
+        val errorHandler = CoroutineExceptionHandler  {
+                coroutineContext, throwable ->
+            throwable.printStackTrace()
+            //Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show()
+        }
+
+        val scope = CoroutineScope(gamesFetchJob + Dispatchers.IO)
+        var myresult: JsonObject
+        var gameRetriever = GameRetriever()
+        scope.launch(errorHandler) {
+            val deferred = async {
+                gameRetriever.getMostPlayedGames().response.ranks
+            }
+            rankList = deferred.await().toMutableList()
+            Log.d("--------Response", "gameList size : ${rankList.size}")
+            var deferred2 : Deferred<JsonObject>
+            rankList = rankList.subList(0, 10)
+            rankList.forEach {
+                deferred2 = async { gameRetriever.getAGame(it.appid.toString()) }
+                myresult = deferred2.await().get(it.appid.toString()).asJsonObject
+                myresult = myresult.getAsJsonObject("data")
+
+                theGames.add(myresult)
+            }
+            Log.d("-----NEW Response", "games size : ${theGames.size}")
+
         }
 
     }

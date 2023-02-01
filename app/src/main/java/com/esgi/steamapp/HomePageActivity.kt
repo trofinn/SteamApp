@@ -1,21 +1,16 @@
 package com.esgi.steamapp
 
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.esgi.steamapp.databinding.HomePageBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.esgi.steamapp.model.Games
+import com.esgi.steamapp.model.MyGames
+import com.esgi.steamapp.service.GameRetriever
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import kotlinx.coroutines.*
 import java.util.*
 
 class HomePageActivity : AppCompatActivity() {
@@ -24,4 +19,6 @@ class HomePageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_page)
     }
+
+
 }
