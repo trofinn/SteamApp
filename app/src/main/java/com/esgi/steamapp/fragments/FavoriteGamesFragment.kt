@@ -53,7 +53,8 @@ class FavoriteGamesFragment : Fragment() {
                                     game.editeur,
                                     game.image,
                                     key!!,
-                                    game.description))
+                                    game.description,"")
+                            )
                         }
                     })
                 }

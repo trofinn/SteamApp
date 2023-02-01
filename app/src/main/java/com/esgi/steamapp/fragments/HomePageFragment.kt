@@ -21,6 +21,7 @@ import com.esgi.steamapp.activity.SignUpActivity
 import com.esgi.steamapp.service.GameRetriever
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import java.util.*
@@ -130,7 +131,7 @@ class HomePageFragment : Fragment() {
                     "[Valve, Hidden Path Entertainment]",
                     url,
                     "730",
-                    view.findViewById<TextView>(R.id.description).text.toString()
+                    view.findViewById<TextView>(R.id.description).text.toString(),""
                 )
             )
         }
@@ -153,7 +154,7 @@ class HomePageFragment : Fragment() {
                             game.editeur,
                             game.image,
                             key!!,
-                            game.description
+                            game.description,""
                         )
                     )
                 }
@@ -371,6 +372,7 @@ class SignUpFragment : Fragment() {
     private lateinit var signUp: Button
     private lateinit var backButton: ImageButton
     private lateinit var auth: FirebaseAuth
+    private lateinit var database : FirebaseDatabase
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -384,6 +386,7 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
         userName = view.findViewById(R.id.user_name)
         email = view.findViewById(R.id.email)
         email.setText(SignUpFragmentArgs.fromBundle(requireArguments()).email)
@@ -426,7 +429,10 @@ class SignUpFragment : Fragment() {
         }
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener() {
             if (it.isSuccessful) {
-                startActivity(Intent(requireContext(), SignUpActivity::class.java))
+                val database_users = database.getReference().child(userName).setValue(userName)
+                findNavController().navigate(
+                    SignUpFragmentDirections.actionSignUpFragmentToSignInFragment(userName)
+                )
                 Toast.makeText(requireContext(), "Inscription complete", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(requireContext(), "Inscription echoué", Toast.LENGTH_SHORT).show()
