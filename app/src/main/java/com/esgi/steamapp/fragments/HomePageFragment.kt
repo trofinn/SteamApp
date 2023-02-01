@@ -16,11 +16,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.*
-import com.esgi.steamapp.activity.ForgotPasswordActivity
 import com.esgi.steamapp.activity.MainActivity
 import com.esgi.steamapp.activity.SignUpActivity
-import com.esgi.steamapp.model.MostPlayedGamesResponse
 import com.esgi.steamapp.service.GameRetriever
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
@@ -211,6 +210,14 @@ class HomePageFragment : Fragment() {
             )
             true
         }
+        R.id.sign_out -> {
+            AuthUI.getInstance()
+                .signOut(requireContext())
+            findNavController().navigate(
+                HomePageFragmentDirections.actionHomePageFragmentToSignInFragment("")
+            )
+            true
+        }
         else -> {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
@@ -312,17 +319,15 @@ class SignInFragment : Fragment() {
         }
 
         forgotPassword.setOnClickListener() {
-            val intent = Intent(requireContext(), ForgotPasswordActivity::class.java)
-            intent.putExtra("email",email.text)
-            startActivity(intent)
+            findNavController().navigate(
+                SignInFragmentDirections.actionSignInFragmentToForgotPasswordFragment(email.text.toString())
+            )
         }
 
         signupButton.setOnClickListener() {
-            val intent = Intent(requireContext(), SignUpActivity::class.java)
-            intent.putExtra("email",email.text)
-            intent.putExtra("password",password.text)
-            startActivity(intent)
-
+            findNavController().navigate(
+                SignInFragmentDirections.actionSignInFragmentToSignUpFragment(email.text.toString(),password.text.toString())
+            )
         }
     }
 
@@ -381,7 +386,9 @@ class SignUpFragment : Fragment() {
 
         userName = view.findViewById(R.id.user_name)
         email = view.findViewById(R.id.email)
+        email.setText(SignUpFragmentArgs.fromBundle(requireArguments()).email)
         password = view.findViewById(R.id.password)
+        password.setText(SignUpFragmentArgs.fromBundle(requireArguments()).password)
         passwordVerification = view.findViewById(R.id.password_verification)
         signUp = view.findViewById(R.id.new_account)
         backButton = view.findViewById(R.id.back_button)
@@ -391,8 +398,7 @@ class SignUpFragment : Fragment() {
         }
 
         backButton.setOnClickListener() {
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent)
+            findNavController().navigateUp()
         }
     }
 

@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
 import com.esgi.steamapp.activity.MainActivity
 import com.esgi.steamapp.R
 import com.google.firebase.auth.FirebaseAuth
@@ -20,12 +21,16 @@ import com.google.firebase.ktx.Firebase
 
 
 class ForgotPasswordFragment : Fragment() {
-    lateinit var email : EditText
-    private lateinit var sendMail : Button
-    private lateinit var auth : FirebaseAuth
-    private lateinit var backButton : ImageButton
+    lateinit var email: EditText
+    private lateinit var sendMail: Button
+    private lateinit var auth: FirebaseAuth
+    private lateinit var backButton: ImageButton
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         setHasOptionsMenu(true)
         return LayoutInflater.from(requireContext())
             .inflate(R.layout.fragment_forgot_password, container, false)
@@ -35,6 +40,7 @@ class ForgotPasswordFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         backButton = view.findViewById(R.id.back_button)
         email = view.findViewById(R.id.email)
+        email.setText(ForgotPasswordFragmentArgs.fromBundle(requireArguments()).email)
         sendMail = view.findViewById(R.id.send_email_button)
         auth = Firebase.auth
         sendMail.setOnClickListener() {
@@ -42,24 +48,30 @@ class ForgotPasswordFragment : Fragment() {
         }
 
         backButton.setOnClickListener() {
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent)
+            findNavController().navigateUp()
         }
     }
+
     private fun sendRecoveryMail() {
         val email = email.text.toString().trim()
 
-        if(email.isBlank()) {
-            Toast.makeText(requireContext(), "Tous les champs sont obligatoires", Toast.LENGTH_SHORT).show()
+        if (email.isBlank()) {
+            Toast.makeText(
+                requireContext(),
+                "Tous les champs sont obligatoires",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
-        auth.sendPasswordResetEmail(email).addOnCompleteListener{
-                task -> if (task.isSuccessful) {
-                    sendMail.setOnClickListener() {
-                        val intent = Intent(requireContext(), MainActivity::class.java)
-                        startActivity(intent)
-                    }
-                    Log.d(ContentValues.TAG,"Email sent") }
+        auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                findNavController().navigateUp()
+                Toast.makeText(
+                    requireContext(), "Recovery email sent",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d(ContentValues.TAG, "Recovery email sent")
+            }
         }
     }
 
