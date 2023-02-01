@@ -1,4 +1,4 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,8 +10,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
+import com.esgi.steamapp.activity.MainActivity
+import com.esgi.steamapp.R
+import com.esgi.steamapp.activity.SignUpActivity
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -44,7 +45,7 @@ class SignUpFragment : Fragment() {
         }
 
         back_button.setOnClickListener() {
-            val intent = Intent(requireContext(),MainActivity::class.java)
+            val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
         }
     }
@@ -65,7 +66,7 @@ class SignUpFragment : Fragment() {
         }
         auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener() {
             if (it.isSuccessful) {
-                startActivity(Intent(requireContext(),SignUpActivity::class.java))
+                startActivity(Intent(requireContext(), SignUpActivity::class.java))
                 Toast.makeText(requireContext(), "Inscription complete", Toast.LENGTH_SHORT).show()
             }
             else {

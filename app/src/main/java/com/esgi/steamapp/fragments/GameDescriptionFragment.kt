@@ -1,12 +1,12 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.fragments
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.esgi.steamapp.R
 
 
 class GameDescriptionFragment : Fragment(R.layout.fragment_game_description) {

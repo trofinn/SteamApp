@@ -1,4 +1,4 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.fragments
 
 import android.content.ContentValues
 import android.content.Intent
@@ -12,7 +12,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.navigation.fragment.findNavController
+import com.esgi.steamapp.activity.MainActivity
+import com.esgi.steamapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -41,7 +42,7 @@ class ForgotPasswordFragment : Fragment() {
         }
 
         back_button.setOnClickListener() {
-            val intent = Intent(requireContext(),MainActivity::class.java)
+            val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
         }
     }
@@ -55,7 +56,7 @@ class ForgotPasswordFragment : Fragment() {
         auth.sendPasswordResetEmail(email).addOnCompleteListener{
                 task -> if (task.isSuccessful) {
                     send_mail.setOnClickListener() {
-                        val intent = Intent(requireContext(),MainActivity::class.java)
+                        val intent = Intent(requireContext(), MainActivity::class.java)
                         startActivity(intent)
                     }
                     Log.d(ContentValues.TAG,"Email sent") }

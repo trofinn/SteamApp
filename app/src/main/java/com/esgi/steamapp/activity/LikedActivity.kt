@@ -1,7 +1,8 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.esgi.steamapp.R
 
 class LikedActivity : AppCompatActivity() {
 
@@ -10,6 +11,3 @@ class LikedActivity : AppCompatActivity() {
         setContentView(R.layout.liked_games)
     }
 }
-
-
-

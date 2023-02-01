@@ -1,4 +1,4 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.fragments
 
 import android.content.ContentValues
 import android.content.Intent
@@ -13,6 +13,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.esgi.steamapp.activity.ForgotPasswordActivity
+import com.esgi.steamapp.R
+import com.esgi.steamapp.activity.SignUpActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class SignInFragment : Fragment() {
@@ -48,7 +51,7 @@ class SignInFragment : Fragment() {
         }
 
         signup_button.setOnClickListener() {
-            val intent = Intent(requireContext(),SignUpActivity::class.java)
+            val intent = Intent(requireContext(), SignUpActivity::class.java)
             startActivity(intent)
         }
     }

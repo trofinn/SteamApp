@@ -18,7 +18,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ForgotPasswordFragment"
+            android:name=".fragments.ForgotPasswordFragment"
             android:exported="false"
             android:label="@string/title_activity_forgot_password_fragment"
             android:theme="@style/Theme.SteamApp.NoActionBar">
@@ -27,18 +27,18 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".FavoriteActivity"
+            android:name=".activity.FavoriteActivity"
             android:exported="false"
-            android:parentActivityName=".HomePageActivity"
+            android:parentActivityName=".activity.HomePageActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".GameDetailsActivity"
+            android:name=".activity.GameDetailsActivity"
             android:exported="false"
-            android:parentActivityName=".HomePageActivity"
+            android:parentActivityName=".activity.HomePageActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             >
             <meta-data
@@ -46,16 +46,16 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".LikedActivity"
+            android:name=".activity.LikedActivity"
             android:exported="false"
-            android:parentActivityName=".HomePageActivity"
+            android:parentActivityName=".activity.HomePageActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value=".HomePageActivity" />
         </activity>
         <activity
-            android:name=".HomePageActivity"
+            android:name=".activity.HomePageActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
@@ -63,7 +63,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ForgotPasswordActivity"
+            android:name=".activity.ForgotPasswordActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:usesCleartextTraffic="true">
@@ -72,7 +72,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".SignUpActivity"
+            android:name=".activity.SignUpActivity"
             android:exported="false"
             android:label="@string/title_activity_sign_up"
             android:theme="@style/Theme.SteamApp.NoActionBar"
@@ -82,7 +82,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:usesCleartextTraffic="true">
