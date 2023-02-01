@@ -1,4 +1,5 @@
 package com.esgi.steamapp.fragments
+package com.esgi.steamapp.fragments
 
 import android.content.ContentValues
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.R
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -151,6 +153,14 @@ class GameDetailsFragment : Fragment() {
                 }
             }
             databaseFavorites.child(gameId).addListenerForSingleValueEvent(eventListener)
+            true
+        }
+        R.id.sign_out -> {
+            AuthUI.getInstance()
+                .signOut(requireContext())
+            findNavController().navigate(
+                GameDetailsFragmentDirections.actionGameDetailsFragmentToSignInFragment("")
+            )
             true
         }
         else -> {

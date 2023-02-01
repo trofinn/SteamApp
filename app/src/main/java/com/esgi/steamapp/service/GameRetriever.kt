@@ -1,7 +1,6 @@
 package com.esgi.steamapp.service
 
-import com.esgi.steamapp.model.Games
-import com.esgi.steamapp.model.MyGames
+import com.esgi.steamapp.model.MostPlayedGamesResponse
 import com.google.gson.JsonObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -32,7 +31,7 @@ class GameRetriever {
         networkInterface2 = retrofit2.create(NetworkInterface::class.java)
     }
 
-    suspend fun getMostPlayedGames() : MyGames {
+    suspend fun getMostPlayedGames() : MostPlayedGamesResponse {
         return networkInterface.getMostPlayedGames()
     }
     suspend fun getAGame(appid: String) : JsonObject {

@@ -16,11 +16,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.esgi.steamapp.*
-import com.esgi.steamapp.activity.ForgotPasswordActivity
 import com.esgi.steamapp.activity.MainActivity
 import com.esgi.steamapp.activity.SignUpActivity
-import com.esgi.steamapp.model.MostPlayedGamesResponse
 import com.esgi.steamapp.service.GameRetriever
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
@@ -70,7 +69,7 @@ class HomePageFragment : Fragment() {
             for (i in api_games) {
                 listOfGameIds.add(i.appid)
             }
-
+            listOfGameIds = listOfGameIds.subList(0, 10)
             var gameDetails: JsonObject
             val gameRetriever = GameRetriever()
             var jsonObject: JsonObject
@@ -87,7 +86,7 @@ class HomePageFragment : Fragment() {
                                 name = gameDetails.get("name").asString,
                                 editeur = gameDetails.get("publishers").asJsonArray.get(0).asString,
                                 prix = if (gameDetails.get("price_overview") != null)
-                                    gameDetails.get("price_overview").asJsonObject.get("final_formatted").asString else
+                                    gameDetails.get("price_overview").asJsonObject.get("initial_formatted").asString else
                                     "free",
                                 image = gameDetails.get("header_image").asString,
                                 description = gameDetails.get("short_description").asString
@@ -96,7 +95,6 @@ class HomePageFragment : Fragment() {
                             gamesMap.set(game_id.toString(), game)
                         }
                     }
-
                 }
             }
             Log.d("--------Response", "gameList size : ${listOfGameIds.size}")
@@ -212,6 +210,14 @@ class HomePageFragment : Fragment() {
             )
             true
         }
+        R.id.sign_out -> {
+            AuthUI.getInstance()
+                .signOut(requireContext())
+            findNavController().navigate(
+                HomePageFragmentDirections.actionHomePageFragmentToSignInFragment("")
+            )
+            true
+        }
         else -> {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
@@ -277,6 +283,130 @@ class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
 interface OnProductListener {
     fun onClicked(game: Game, position: Int) {
+
+    }
+}
+
+class SignInFragment : Fragment() {
+    lateinit var email: EditText
+    lateinit var password: EditText
+    private lateinit var loginButton: Button
+    private lateinit var forgotPassword: TextView
+    private lateinit var signupButton: Button
+    private lateinit var auth: FirebaseAuth
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return LayoutInflater.from(requireContext())
+            .inflate(R.layout.fragment_sign_in, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        email = view.findViewById(R.id.email)
+        password = view.findViewById(R.id.password)
+        loginButton = view.findViewById(R.id.login)
+        forgotPassword = view.findViewById(R.id.forgot_password)
+        signupButton = view.findViewById(R.id.new_account)
+        auth = FirebaseAuth.getInstance()
+
+        loginButton.setOnClickListener() {
+            login()
+        }
+
+        forgotPassword.setOnClickListener() {
+            findNavController().navigate(
+                SignInFragmentDirections.actionSignInFragmentToForgotPasswordFragment(email.text.toString())
+            )
+        }
+
+        signupButton.setOnClickListener() {
+            findNavController().navigate(
+                SignInFragmentDirections.actionSignInFragmentToSignUpFragment(email.text.toString(),password.text.toString())
+            )
+        }
+    }
+
+    private fun login() {
+        val email = email.text.toString().trim()
+        val password = password.text.toString().trim()
+        if (email.isBlank() || password.isBlank()) {
+            Toast.makeText(
+                requireContext(),
+                "Tous les champs sont obligatoires",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        auth.signInWithEmailAndPassword(email.trim(), password.trim())
+            .addOnCompleteListener() { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(requireContext(), "Connexion Success", Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(
+                        SignInFragmentDirections.actionSignInFragmentToHomePageFragment(
+                            email,
+                            "",
+                            "",
+                            "",
+                            ""
+                        )
+                    )
+                } else {
+                    Log.w(ContentValues.TAG, "createUserWithEmail:failure ", task.exception)
+                    Toast.makeText(requireContext(), "Connexion Echoué", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+}
+
+class SignUpFragment : Fragment() {
+    lateinit var userName: EditText
+    lateinit var email: EditText
+    lateinit var password: EditText
+    lateinit var passwordVerification: EditText
+    private lateinit var signUp: Button
+    private lateinit var backButton: ImageButton
+    private lateinit var auth: FirebaseAuth
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return LayoutInflater.from(requireContext())
+            .inflate(R.layout.fragment_sign_up, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        userName = view.findViewById(R.id.user_name)
+        email = view.findViewById(R.id.email)
+        email.setText(SignUpFragmentArgs.fromBundle(requireArguments()).email)
+        password = view.findViewById(R.id.password)
+        password.setText(SignUpFragmentArgs.fromBundle(requireArguments()).password)
+        passwordVerification = view.findViewById(R.id.password_verification)
+        signUp = view.findViewById(R.id.new_account)
+        backButton = view.findViewById(R.id.back_button)
+        auth = FirebaseAuth.getInstance()
+        signUp.setOnClickListener() {
+            signUpUser()
+        }
+
+        backButton.setOnClickListener() {
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun signUpUser() {
+        val userName = userName.text.toString()
+        val email = email.text.toString()
+        val password = password.text.toString()
+        val passwordVerification = passwordVerification.text.toString()
 
     }
 }
