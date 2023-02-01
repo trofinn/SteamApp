@@ -21,9 +21,9 @@ import com.google.firebase.ktx.Firebase
 
 class ForgotPasswordFragment : Fragment() {
     lateinit var email : EditText
-    private lateinit var send_mail : Button
+    private lateinit var sendMail : Button
     private lateinit var auth : FirebaseAuth
-    private lateinit var back_button : ImageButton
+    private lateinit var backButton : ImageButton
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -33,15 +33,15 @@ class ForgotPasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        back_button = view.findViewById(R.id.back_button)
+        backButton = view.findViewById(R.id.back_button)
         email = view.findViewById(R.id.email)
-        send_mail = view.findViewById(R.id.send_email_button)
+        sendMail = view.findViewById(R.id.send_email_button)
         auth = Firebase.auth
-        send_mail.setOnClickListener() {
+        sendMail.setOnClickListener() {
             sendRecoveryMail()
         }
 
-        back_button.setOnClickListener() {
+        backButton.setOnClickListener() {
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
         }
@@ -55,7 +55,7 @@ class ForgotPasswordFragment : Fragment() {
         }
         auth.sendPasswordResetEmail(email).addOnCompleteListener{
                 task -> if (task.isSuccessful) {
-                    send_mail.setOnClickListener() {
+                    sendMail.setOnClickListener() {
                         val intent = Intent(requireContext(), MainActivity::class.java)
                         startActivity(intent)
                     }

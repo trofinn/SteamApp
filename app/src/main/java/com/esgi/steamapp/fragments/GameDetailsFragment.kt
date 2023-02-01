@@ -19,12 +19,12 @@ import com.google.firebase.database.ValueEventListener
 
 
 class GameDetailsFragment : Fragment() {
-    private lateinit var game_name : TextView
-    private lateinit var game_editor : TextView
-    private lateinit var game_photo_link : String
-    private lateinit var game_photo : ImageView
-    private lateinit var game_description : TextView
-    private lateinit var game_id : String
+    private lateinit var gameName : TextView
+    private lateinit var gameEditor : TextView
+    private lateinit var gamePhotoLink : String
+    private lateinit var gamePhoto : ImageView
+    private lateinit var gameDescription : TextView
+    private lateinit var gameId : String
     private lateinit var database : FirebaseDatabase
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,10 +39,10 @@ class GameDetailsFragment : Fragment() {
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
-        game_name = view.findViewById(R.id.nom)
-        game_editor = view.findViewById(R.id.editeur2)
-        game_photo = view.findViewById(R.id.image)
-        game_description = view.findViewById(R.id.data_transition_view)
+        gameName = view.findViewById(R.id.nom)
+        gameEditor = view.findViewById(R.id.editeur2)
+        gamePhoto = view.findViewById(R.id.image)
+        gameDescription = view.findViewById(R.id.data_transition_view)
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
         toolbar.setNavigationOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
@@ -51,26 +51,26 @@ class GameDetailsFragment : Fragment() {
         })
 
 
-        game_name.text =  GameDetailsFragmentArgs.fromBundle(requireArguments()).gameName
-        game_id = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameId
-        game_editor.text = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameEditor
-        game_description.text = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameDescription
-        game_photo_link = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameImage
-        game_photo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        gameName.text =  GameDetailsFragmentArgs.fromBundle(requireArguments()).gameName
+        gameId = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameId
+        gameEditor.text = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameEditor
+        gameDescription.text = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameDescription
+        gamePhotoLink = GameDetailsFragmentArgs.fromBundle(requireArguments()).gameImage
+        gamePhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
 
-        Glide.with(this).load(game_photo_link).into(game_photo)
+        Glide.with(this).load(gamePhotoLink).into(gamePhoto)
 
-        game_photo = view.findViewById(R.id.mini_image)
-        Glide.with(this).load(game_photo_link).centerCrop().into(game_photo)
-        replaceFragment(GameDescriptionFragment().newInstance(game_description.text.toString()))
+        gamePhoto = view.findViewById(R.id.mini_image)
+        Glide.with(this).load(gamePhotoLink).centerCrop().into(gamePhoto)
+        replaceFragment(GameDescriptionFragment().newInstance(gameDescription.text.toString()))
         view.findViewById<Button>(R.id.description_button).setOnClickListener() {
             //onClick(findViewById<Button>(R.id.description_button))
-            replaceFragment(GameDescriptionFragment().newInstance(game_description.text.toString()))
+            replaceFragment(GameDescriptionFragment().newInstance(gameDescription.text.toString()))
         }
         view.findViewById<Button>(R.id.avis_button).setOnClickListener {
             //onClick(findViewById<Button>(R.id.avis_button))
-            replaceFragment(GameAvisFragment().newInstance(game_id.toString()))
+            replaceFragment(GameAvisFragment().newInstance(gameId.toString()))
         }
     }
     private fun replaceFragment(fragment : Fragment) {
@@ -88,7 +88,7 @@ class GameDetailsFragment : Fragment() {
         val database_favorites = database.getReference().child("Favorites")
         database_likes.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.child(game_id).exists()) {
+                if(snapshot.child(gameId).exists()) {
                     menu.getItem(0).setIcon(R.drawable.like_full)
                 }
             }
@@ -97,7 +97,7 @@ class GameDetailsFragment : Fragment() {
         })
         database_favorites.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.child(game_id).exists()) {
+                if(snapshot.child(gameId).exists()) {
                     menu.getItem(1).setIcon(R.drawable.whishlist_full)
                 }
             }
@@ -106,19 +106,19 @@ class GameDetailsFragment : Fragment() {
     }
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId)  {
         R.id.like -> {
-            val database_likes = database.getReference().child("Likes")
+            val databaseLikes = database.getReference().child("Likes")
             val eventListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(!snapshot.exists()) {
                         item.setIcon(R.drawable.like_full)
-                        database_likes.child(game_id).child("name").setValue(game_name.text)
-                        database_likes.child(game_id).child("dev").setValue(game_editor.text)
-                        database_likes.child(game_id).child("photo").setValue(game_photo_link)
-                        database_likes.child(game_id).child("description").setValue(game_description.text)
+                        databaseLikes.child(gameId).child("name").setValue(gameName.text)
+                        databaseLikes.child(gameId).child("dev").setValue(gameEditor.text)
+                        databaseLikes.child(gameId).child("photo").setValue(gamePhotoLink)
+                        databaseLikes.child(gameId).child("description").setValue(gameDescription.text)
                     }
                     else {
                         item.setIcon(R.drawable.like)
-                        database_likes.child(game_id).removeValue()
+                        databaseLikes.child(gameId).removeValue()
                     }
                 }
 
@@ -126,31 +126,31 @@ class GameDetailsFragment : Fragment() {
                     Log.d(ContentValues.TAG, error.getMessage());
                 }
             }
-            database_likes.child(game_id).addListenerForSingleValueEvent(eventListener)
+            databaseLikes.child(gameId).addListenerForSingleValueEvent(eventListener)
             true
         }
 
         R.id.favorite -> {
-            val database_favorites = database.getReference().child("Favorites")
+            val databaseFavorites = database.getReference().child("Favorites")
             val eventListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(!snapshot.exists()) {
                         item.setIcon(R.drawable.whishlist_full)
-                        database_favorites.child(game_id).child("name").setValue(game_name.text)
-                        database_favorites.child(game_id).child("dev").setValue(game_editor.text)
-                        database_favorites.child(game_id).child("photo").setValue(game_photo_link)
-                        database_favorites.child(game_id).child("description").setValue(game_description.text)
+                        databaseFavorites.child(gameId).child("name").setValue(gameName.text)
+                        databaseFavorites.child(gameId).child("dev").setValue(gameEditor.text)
+                        databaseFavorites.child(gameId).child("photo").setValue(gamePhotoLink)
+                        databaseFavorites.child(gameId).child("description").setValue(gameDescription.text)
                     }
                     else {
                         item.setIcon(R.drawable.whishlist)
-                        database_favorites.child(game_id).removeValue()
+                        databaseFavorites.child(gameId).removeValue()
                     }
                 }
                 override fun onCancelled(error: DatabaseError) {
                     Log.d(ContentValues.TAG, error.getMessage());
                 }
             }
-            database_favorites.child(game_id).addListenerForSingleValueEvent(eventListener)
+            databaseFavorites.child(gameId).addListenerForSingleValueEvent(eventListener)
             true
         }
         else -> {

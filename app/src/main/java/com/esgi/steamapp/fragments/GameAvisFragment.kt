@@ -16,9 +16,9 @@ import kotlinx.coroutines.*
 
 class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
 
-    private val avis_list = mutableListOf<Avis>()
-    private lateinit var recycler_view : RecyclerView
-    private lateinit var game_id : String
+    private val avisList = mutableListOf<Avis>()
+    private lateinit var recyclerView : RecyclerView
+    private lateinit var gameId : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +35,7 @@ class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = inflater.inflate(R.layout.fragment_game_avis, container, false)
-        game_id = arguments?.getString("game_id").toString()
+        gameId = arguments?.getString("game_id").toString()
         return view
     }
 
@@ -43,31 +43,30 @@ class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
         super.onViewCreated(view, savedInstanceState)
 
         GlobalScope.launch(Dispatchers.Main) {
-            var progressbar = view.findViewById<ProgressBar>(R.id.progressbar)
-            var avis_list_rview = view.findViewById<RecyclerView>(R.id.avis_list)
+            val progressbar = view.findViewById<ProgressBar>(R.id.progressbar)
+            recyclerView = view.findViewById(R.id.avis_list)
             progressbar.visibility = View.VISIBLE
-            avis_list_rview.visibility = View.INVISIBLE
+            recyclerView.visibility = View.INVISIBLE
 
             val response = withContext(Dispatchers.Default) {
-                NetworkManagerAvisList.getListAvis(game_id)
+                NetworkManagerAvisList.getListAvis(gameId)
             }
             withContext(Dispatchers.Default) {
                 val avis = response.reviews
                 for(i in avis) {
-                    avis_list.add(i)
-                    println("aaaaaaa ${i.review}")
+                    avisList.add(i)
                 }
 
                 activity?.runOnUiThread(java.lang.Runnable {
-                    recycler_view = view.findViewById(R.id.avis_list)
-                    recycler_view.apply {
+                    recyclerView = view.findViewById(R.id.avis_list)
+                    recyclerView.apply {
                         layoutManager = GridLayoutManager(activity,1)
-                        adapter = AvisListAdapter(avis_list)
+                        adapter = AvisListAdapter(avisList)
                     }
                 })
             }
             progressbar.visibility = View.INVISIBLE
-            avis_list_rview.visibility = View.VISIBLE
+            recyclerView.visibility = View.VISIBLE
         }
     }
 }
