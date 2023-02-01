@@ -1,6 +1,6 @@
 package com.esgi.steamapp.model
 
-data class Games(
+data class GameDetailResponse(
     val `570`: Result
 ) {
     data class Result(

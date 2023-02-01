@@ -1,6 +1,6 @@
 package com.esgi.steamapp.model
 
-data class MyGames(
+data class MostPlayedGamesResponse(
     val response: Response
 ) {
     data class Response(

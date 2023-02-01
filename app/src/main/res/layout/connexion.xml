@@ -8,7 +8,7 @@
     app:navGraph="@navigation/navigation_graph"
     app:defaultNavHost="true"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".activity.MainActivity"
     android:background="@color/dark_grey"
     android:id="@+id/container1">
 

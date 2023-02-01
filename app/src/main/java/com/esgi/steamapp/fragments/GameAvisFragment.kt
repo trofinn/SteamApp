@@ -1,24 +1,18 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.esgi.steamapp.databinding.ActivityFavoriteBinding.inflate
-import com.esgi.steamapp.databinding.FragmentGameAvisBinding
-import com.esgi.steamapp.databinding.HomePageBinding
+import com.esgi.steamapp.Avis
+import com.esgi.steamapp.NetworkManagerAvisList
+import com.esgi.steamapp.R
 import kotlinx.coroutines.*
-import java.lang.Runnable
 
 class GameAvisFragment : Fragment(R.layout.fragment_game_avis) {
 

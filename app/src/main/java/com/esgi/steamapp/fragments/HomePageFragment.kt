@@ -1,5 +1,6 @@
-package com.esgi.steamapp
+package com.esgi.steamapp.fragments
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -14,11 +15,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.esgi.steamapp.databinding.HomePageBinding
-import com.esgi.steamapp.model.Games
-import com.esgi.steamapp.model.MyGames
+import com.esgi.steamapp.*
+import com.esgi.steamapp.activity.ForgotPasswordActivity
+import com.esgi.steamapp.activity.MainActivity
+import com.esgi.steamapp.activity.SignUpActivity
+import com.esgi.steamapp.model.MostPlayedGamesResponse
 import com.esgi.steamapp.service.GameRetriever
-import com.google.gson.Gson
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import java.util.*
@@ -34,7 +37,7 @@ class HomePageFragment : Fragment() {
     var list_of_game_ids_test : MutableList<String> = emptyList<String>().toMutableList()
     var game_filtered = mutableMapOf<String, Game>()
 
-    var rankList : MutableList<MyGames.Response.Rank> = mutableListOf()
+    var rankList : MutableList<MostPlayedGamesResponse.Response.Rank> = mutableListOf()
     var theGames : MutableList<JsonObject> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,7 +53,7 @@ class HomePageFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         recycler_view = view.findViewById(R.id.game_list)
         list_of_game_ids_test.add("730")
-        list_of_game_ids_test.add("578080");
+        list_of_game_ids_test.add("578080")
 
         val searchView = view.findViewById<SearchView>(R.id.search_bar)
 
@@ -65,41 +68,32 @@ class HomePageFragment : Fragment() {
             for (i in api_games) {
                 list_of_game_ids.add(i.appid)
             }
-            list_of_game_ids = list_of_game_ids.subList(0, 15)
+
             var game_details: JsonObject
             var gameRetriever = GameRetriever()
             var deferred: Deferred<JsonObject>
             withContext(Dispatchers.Default) {
                 for(game_id in list_of_game_ids) {
                     deferred = async { gameRetriever.getAGame(game_id.toString()) }
+
                     game_details = deferred.await().get(game_id.toString()).asJsonObject
-                        .getAsJsonObject("data")
+                    if (game_details.getAsJsonObject("data") != null) {
+                        game_details = game_details.getAsJsonObject("data")
+                        val game = Game(
+                            name = game_details.get("name").asString,
+                            editeur = game_details.get("publishers").asJsonArray.get(0).asString
+                            , prix = if (game_details.get("price_overview") != null)
+                                game_details.get("price_overview").asJsonObject.get("initial_formatted").asString else
+                                "free",
+                            image = game_details.get("header_image").asString,
+                            description = game_details.get("short_description").asString)
 
-                    val game = Game(
-                        name = game_details.get("name").asString,
-                        editeur = game_details.get("publishers").asJsonArray.get(0).asString
-                        , prix = if (game_details.get("price_overview") != null)
-                    game_details.get("price_overview").asJsonObject.get("initial_formatted").asString else
-                    "free",
-                        image = game_details.get("header_image").asString,
-                        description = game_details.get("short_description").asString)
-                    println(game)
-                    games.add(game)
-                    games_map.set(game_id.toString(),game)
-                    /*val game_details = NetworkManagerGameDetails.getGameDetails(game_id)
-
-                    if(game_id == "730") {
-                        val game = Game(name = game_details.appid.data.name, editeur = game_details.appid.data.developers.toString(), prix = "00,00 $", image = game_details.appid.data.headerImage, description = game_details.appid.data.shortDescription)
                         games.add(game)
-                        games_map.set(game_id,game)
-                    }
-                    if(game_id == "578080"){
-                        val game = Game(name = game_details.appid2.data.name.toString(), editeur = game_details.appid2.data.developers.toString(), prix = "00,00 $", image = game_details.appid2.data.headerImage, description = game_details.appid2.data.shortDescription)
-                        games.add(game)
-                        games_map.set(game_id,game)
+                        games_map.set(game_id.toString(),game)
                     }
 
-                     */
+
+
                 }
             }
             Log.d("--------Response", "gameList size : ${list_of_game_ids.size}")
@@ -151,37 +145,6 @@ class HomePageFragment : Fragment() {
                     url,
                     "730",
                     view.findViewById<TextView>(R.id.description).text.toString()))
-        }
-
-    }
-    private fun fetchGames() {
-        val gamesFetchJob = Job()
-        val errorHandler = CoroutineExceptionHandler  {
-                coroutineContext, throwable ->
-            throwable.printStackTrace()
-            //Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show()
-        }
-
-        val scope = CoroutineScope(gamesFetchJob + Dispatchers.IO)
-        var myresult: JsonObject
-        var gameRetriever = GameRetriever()
-        scope.launch(errorHandler) {
-            val deferred = async {
-                gameRetriever.getMostPlayedGames().response.ranks
-            }
-            rankList = deferred.await().toMutableList()
-            Log.d("--------Response", "gameList size : ${rankList.size}")
-            var deferred2 : Deferred<JsonObject>
-            rankList = rankList.subList(0, 10)
-            rankList.forEach {
-                deferred2 = async { gameRetriever.getAGame(it.appid.toString()) }
-                myresult = deferred2.await().get(it.appid.toString()).asJsonObject
-                myresult = myresult.getAsJsonObject("data")
-
-                theGames.add(myresult)
-            }
-            Log.d("-----NEW Response", "games size : ${theGames.size}")
-
         }
 
     }
@@ -313,5 +276,137 @@ class GameViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 interface OnProductListener {
     fun onClicked(game : Game, position : Int) {
 
+    }
+}
+
+class SignInFragment : Fragment() {
+    lateinit var email : EditText
+    lateinit var password : EditText
+    private lateinit var login_button : Button
+    private lateinit var forgot_password : TextView
+    private lateinit var signup_button : Button
+    private lateinit var auth: FirebaseAuth
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return LayoutInflater.from(requireContext())
+            .inflate(R.layout.fragment_sign_in, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        email = view.findViewById(R.id.email)
+        password = view.findViewById(R.id.password)
+        login_button = view.findViewById(R.id.login)
+        forgot_password = view.findViewById(R.id.forgot_password)
+        signup_button = view.findViewById(R.id.new_account)
+        auth = FirebaseAuth.getInstance()
+
+        login_button.setOnClickListener() {
+            login()
+        }
+
+        forgot_password.setOnClickListener() {
+            val intent = Intent(requireContext(), ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
+
+        signup_button.setOnClickListener() {
+            val intent = Intent(requireContext(), SignUpActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun login() {
+        val email = email.text.toString().trim()
+        val password = password.text.toString().trim()
+        if(email.isBlank() || password.isBlank()) {
+            Toast.makeText(
+                requireContext(),
+                "Tous les champs sont obligatoires",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        auth.signInWithEmailAndPassword(email.trim(),password.trim()).addOnCompleteListener() {
+                task ->
+            if (task.isSuccessful) {
+                Toast.makeText(requireContext(), "Connexion Success", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(
+                    SignInFragmentDirections.actionSignInFragmentToHomePageFragment(email,"","","",""))
+            }
+            else {
+                Log.w(ContentValues.TAG, "createUserWithEmail:failure ", task.exception)
+                Toast.makeText(requireContext(), "Connexion Echoué", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+class SignUpFragment : Fragment() {
+    lateinit var user_name : EditText
+    lateinit var email : EditText
+    lateinit var password : EditText
+    lateinit var password_verification : EditText
+    private lateinit var sign_up : Button
+    private lateinit var back_button : ImageButton
+    private lateinit var auth : FirebaseAuth
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return LayoutInflater.from(requireContext())
+            .inflate(R.layout.fragment_sign_up, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        user_name = view.findViewById(R.id.user_name)
+        email = view.findViewById(R.id.email)
+        password = view.findViewById(R.id.password)
+        password_verification = view.findViewById(R.id.password_verification)
+        sign_up = view.findViewById(R.id.new_account)
+        back_button = view.findViewById(R.id.back_button)
+        auth = FirebaseAuth.getInstance()
+        sign_up.setOnClickListener() {
+            signUpUser()
+        }
+
+        back_button.setOnClickListener() {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun signUpUser() {
+        var user_name = user_name.text.toString()
+        var email = email.text.toString()
+        var password = password.text.toString()
+        var password_verification = password_verification.text.toString()
+
+        if (user_name.isBlank() || email.isBlank() || password.isBlank() || password_verification.isBlank()) {
+            Toast.makeText(
+                requireContext(),
+                "Tous les champs sont obligatoires",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        if (password != password_verification) {
+            Toast.makeText(
+                requireContext(),
+                "Le mot de passe ne corresponde pas",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener() {
+            if (it.isSuccessful) {
+                startActivity(Intent(requireContext(), SignUpActivity::class.java))
+                Toast.makeText(requireContext(), "Inscription complete", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                Toast.makeText(requireContext(), "Inscription echoué", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

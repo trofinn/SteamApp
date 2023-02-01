@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homePageFragment"
-        android:name="com.esgi.steamapp.HomePageFragment"
+        android:name="com.esgi.steamapp.fragments.HomePageFragment"
         android:label="HomePageFragment" >
         <action
             android:id="@+id/action_homePageFragment_to_gameDetailsFragment"
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/gameDetailsFragment"
-        android:name="com.esgi.steamapp.GameDetailsFragment"
+        android:name="com.esgi.steamapp.fragments.GameDetailsFragment"
         android:label="GameDetailsFragment" >
         <argument
             android:name="game_name"
@@ -59,7 +59,7 @@
     </fragment>
     <fragment
         android:id="@+id/likedGamesFragment"
-        android:name="com.esgi.steamapp.LikedGamesFragment"
+        android:name="com.esgi.steamapp.fragments.LikedGamesFragment"
         android:label="fragment_liked_games"
         tools:layout="@layout/fragment_liked_games" >
         <action
@@ -72,7 +72,7 @@
     </fragment>
     <fragment
         android:id="@+id/favoriteGamesFragment"
-        android:name="com.esgi.steamapp.FavoriteGamesFragment"
+        android:name="com.esgi.steamapp.fragments.FavoriteGamesFragment"
         android:label="fragment_favorite_games"
         tools:layout="@layout/fragment_favorite_games" >
         <action
@@ -85,7 +85,7 @@
     </fragment>
     <fragment
         android:id="@+id/signInFragment"
-        android:name="com.esgi.steamapp.SignInFragment"
+        android:name="com.esgi.steamapp.fragments.SignInFragment"
         android:label="fragment_sign_in"
         tools:layout="@layout/fragment_sign_in" >
         <action
@@ -100,7 +100,7 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.esgi.steamapp.SignUpFragment"
+        android:name="com.esgi.steamapp.fragments.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" >
         <action
@@ -109,7 +109,7 @@
     </fragment>
     <fragment
         android:id="@+id/forgotPasswordFragment"
-        android:name="com.esgi.steamapp.ForgotPasswordFragment"
+        android:name="com.esgi.steamapp.fragments.ForgotPasswordFragment"
         android:label="fragment_forgot_password"
         tools:layout="@layout/fragment_forgot_password" >
         <action
