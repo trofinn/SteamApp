@@ -1,5 +1,4 @@
 package com.esgi.steamapp.fragments
-package com.esgi.steamapp.fragments
 
 import android.content.ContentValues
 import android.os.Bundle

@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.esgi.steamapp.R
 import com.esgi.steamapp.fragments.SignUpFragment
-import com.esgi.steamapp.R
-import com.esgi.steamapp.fragments.SignUpFragment
 
 class SignUpActivity : AppCompatActivity() {
 

@@ -1,7 +1,5 @@
 package com.esgi.steamapp.activity
-package com.esgi.steamapp.activity
 
-import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.esgi.steamapp.R

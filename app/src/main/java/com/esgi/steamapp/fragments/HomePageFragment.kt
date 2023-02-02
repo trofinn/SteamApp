@@ -86,7 +86,7 @@ class HomePageFragment : Fragment() {
                                 name = gameDetails.get("name").asString,
                                 editeur = gameDetails.get("publishers").asJsonArray.get(0).asString,
                                 prix = if (gameDetails.get("price_overview") != null)
-                                    gameDetails.get("price_overview").asJsonObject.get("initial_formatted").asString else
+                                    gameDetails.get("price_overview").asJsonObject.get("final_formatted").asString else
                                     "free",
                                 image = gameDetails.get("header_image").asString,
                                 description = gameDetails.get("short_description").asString
