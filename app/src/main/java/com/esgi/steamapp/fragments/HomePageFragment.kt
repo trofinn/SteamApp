@@ -21,6 +21,7 @@ import com.esgi.steamapp.activity.SignUpActivity
 import com.esgi.steamapp.service.GameRetriever
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import java.util.*
@@ -130,7 +131,7 @@ class HomePageFragment : Fragment() {
                     "[Valve, Hidden Path Entertainment]",
                     url,
                     "730",
-                    view.findViewById<TextView>(R.id.description).text.toString()
+                    view.findViewById<TextView>(R.id.description).text.toString(),""
                 )
             )
         }
@@ -153,7 +154,7 @@ class HomePageFragment : Fragment() {
                             game.editeur,
                             game.image,
                             key!!,
-                            game.description
+                            game.description,""
                         )
                     )
                 }
