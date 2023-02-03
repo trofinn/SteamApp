@@ -14,7 +14,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="bienvenue">Bienvenue !</string>
-    <string name="veuillez_vous_connecter_ou_n_cr_er_un_nouveau_compte_n_pour_utiliser_l_application">Veuillez vous connecter ou \n créer un nouveau compte \n pour utiliser l’application.</string>
+    <string name="veuillez_vous_connecter_ou_n_cr_er_un_nouveau_compte_n_pour_utiliser_l_application" translatable="false">Veuillez vous connecter ou \n créer un nouveau compte \n pour utiliser l’application.</string>
     <string name="mot_de_passe">Mot de passe</string>
     <string name="se_connecter">Se connecter</string>
     <string name="cr_er_un_nouveau_compte">Créer un nouveau compte</string>

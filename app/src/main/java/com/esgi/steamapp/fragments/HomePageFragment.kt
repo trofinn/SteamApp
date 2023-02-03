@@ -1,8 +1,7 @@
 package com.esgi.steamapp.fragments
 
-import android.content.ContentValues
+import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -15,13 +14,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.esgi.steamapp.*
-import com.esgi.steamapp.activity.MainActivity
-import com.esgi.steamapp.activity.SignUpActivity
+import com.esgi.steamapp.NetworkManagerGameList
+import com.esgi.steamapp.R
+import com.esgi.steamapp.model.GameDetailResponse
+import com.esgi.steamapp.model.SearchGameResponse
 import com.esgi.steamapp.service.GameRetriever
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import java.util.*
@@ -35,9 +33,11 @@ class HomePageFragment : Fragment() {
     val games = mutableListOf<Game>()
     val gamesMap = mutableMapOf<String, Game>()
     var gamesFiltered = mutableMapOf<String, Game>()
+    lateinit var searchView: SearchView
 
     //var rankList: MutableList<MostPlayedGamesResponse.Response.Rank> = mutableListOf()
     //var theGames: MutableList<JsonObject> = mutableListOf()
+    val gameRetriever: GameRetriever = GameRetriever()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +56,7 @@ class HomePageFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         recyclerView = view.findViewById(R.id.game_list)
 
-        val searchView = view.findViewById<SearchView>(R.id.search_bar)
+        searchView = view.findViewById<SearchView>(R.id.search_bar)
 
         GlobalScope.launch(Dispatchers.Main) {
             view.findViewById<ProgressBar>(R.id.progressbar).visibility = View.VISIBLE
@@ -106,12 +106,22 @@ class HomePageFragment : Fragment() {
             if (it == null) {
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String?): Boolean {
+                        view.findViewById<ProgressBar>(R.id.progressbar).visibility = View.VISIBLE
+                        recyclerView.visibility = View.GONE
+                        GlobalScope.launch {
+                            filter(query!!)
+                        }
+
+                        view.findViewById<ProgressBar>(R.id.progressbar).visibility = View.GONE
+                        recyclerView.visibility = View.VISIBLE
+
                         return false
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        val new_games_list = filter(newText!!)
-                        buildRecyclerView(recyclerView, new_games_list, requireContext())
+                        //val new_games_list = filter(newText!!)
+
+                        //buildRecyclerView(recyclerView, new_games_list, requireContext())
                         return false
                     }
                 })
@@ -163,32 +173,98 @@ class HomePageFragment : Fragment() {
         return gamesList
     }
 
-    private fun filter(newText: String): MutableMap<String, Game> {
+    private suspend fun filter(newText: String) {
         gamesFiltered.clear()
         val searchText = newText.lowercase(Locale.getDefault())
+        val errorHandler = CoroutineExceptionHandler  {
+                coroutineContext, throwable ->
+            throwable.printStackTrace()
+            Toast.makeText(this.context, "Error", Toast.LENGTH_SHORT).show()
+        }
         if (searchText.isNotEmpty()) {
+            var gameDetails : JsonObject
+            var result : List<SearchGameResponse>
+            try {
 
-            gamesMap.forEach {
-                if (it.value.name.lowercase(Locale.getDefault()).contains(searchText)) {
-                    gamesFiltered.set(it.key, it.value)
+                GlobalScope.launch(Dispatchers.IO) {
+                    result = async { gameRetriever.searchGame(searchText) }.await()
+                    println("---- SIZE ------${result.size}")
+                    result.forEach {
+                        gameDetails = async { gameRetriever.getAGame(it.appid) }
+                            .await().getAsJsonObject(it.appid)
+                        if (gameDetails.getAsJsonObject("data") != null) {
+                            gameDetails = gameDetails.getAsJsonObject("data")
+                            gamesFiltered[it.appid] = Game(
+                                name = gameDetails.get("name").asString,
+                                editeur = gameDetails.get("publishers").asJsonArray.get(0).asString,
+                                prix = if (gameDetails.get("price_overview") != null)
+                                    gameDetails.get("price_overview").asJsonObject.get("final_formatted").asString else
+                                    "free",
+                                image = gameDetails.get("header_image").asString,
+                                description = gameDetails.get("short_description").asString)
+                        }
+
+
+                    }
+                    if (gamesFiltered.isEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                requireContext(), "No Data Found..",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            println(gamesFiltered.size)
+                            recyclerView.adapter = ListAdapter(gamesFiltered.values.toMutableList(),
+                                object : OnProductListener {
+                                    override fun onClicked(game: Game, position: Int) {
+                                        val key = getKey(gamesFiltered, game)
+                                        findNavController().navigate(
+                                            HomePageFragmentDirections.actionHomePageFragmentToGameDetailsFragment(
+                                                game.name,
+                                                game.editeur,
+                                                game.image,
+                                                key!!,
+                                                game.description,""
+                                            )
+                                        )
+                                    }
+                                })
+                        }
+
+                    }
                 }
+
+            }
+            catch (e: Exception) {
+                println(e.message)
             }
 
-            if (gamesFiltered.isEmpty()) {
-                Toast.makeText(
-                    requireContext(), "No Data Found..",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                //recycler_view.adapter!!.notifyDataSetChanged()
-            }
+
+
 
         } else {
             gamesFiltered.clear()
-            gamesFiltered = gamesMap
-            //recycler_view.adapter!!.notifyDataSetChanged()
+            gamesFiltered.putAll(gamesMap)
+            recyclerView.adapter = ListAdapter(gamesFiltered.values.toMutableList(),
+                object : OnProductListener {
+                    override fun onClicked(game: Game, position: Int) {
+                        val key = getKey(gamesMap, game)
+                        findNavController().navigate(
+                            HomePageFragmentDirections.actionHomePageFragmentToGameDetailsFragment(
+                                game.name,
+                                game.editeur,
+                                game.image,
+                                key!!,
+                                game.description,""
+                            )
+                        )
+                    }
+                })
         }
-        return gamesFiltered
+        //return gamesFiltered
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -235,10 +311,15 @@ data class Game(
     val description: String
 )
 
-class ListAdapter(val games: MutableList<Game>, val listener: OnProductListener) :
+class ListAdapter(games: MutableList<Game>, val listener: OnProductListener) :
     RecyclerView.Adapter<GameViewHolder>() {
 
+    private var games: MutableList<Game>
     override fun getItemCount(): Int = games.size
+
+    init {
+        this.games = games
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder {
         return GameViewHolder(
