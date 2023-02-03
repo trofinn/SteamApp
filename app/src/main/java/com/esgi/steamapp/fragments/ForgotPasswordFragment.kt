@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.navigation.fragment.NavHostFragment
 import com.esgi.steamapp.activity.MainActivity
 import com.esgi.steamapp.R
@@ -60,6 +61,7 @@ class ForgotPasswordFragment : Fragment() {
                         val intent = Intent(requireContext(), MainActivity::class.java)
                         startActivity(intent)
                     }
+                    Toast.makeText(requireContext(),"Email sent", Toast.LENGTH_SHORT).show()
                     Log.d(ContentValues.TAG,"Email sent") }
         }
     }

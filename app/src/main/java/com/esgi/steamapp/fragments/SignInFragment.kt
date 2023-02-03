@@ -40,7 +40,7 @@ class SignInFragment : Fragment() {
         forgot_password = view.findViewById(R.id.forgot_password)
         signup_button = view.findViewById(R.id.new_account)
         auth = FirebaseAuth.getInstance()
-
+        val user = auth.getCurrentUser();
         login_button.setOnClickListener() {
             login()
         }

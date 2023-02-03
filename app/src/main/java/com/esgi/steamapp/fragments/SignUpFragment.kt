@@ -76,7 +76,7 @@ class SignUpFragment : Fragment() {
                 Toast.makeText(requireContext(), "Inscription complete", Toast.LENGTH_SHORT).show()
             }
             else {
-                Toast.makeText(requireContext(),"Inscription echoué", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),"Inscription echoué ", Toast.LENGTH_SHORT).show()
             }
         }
     }

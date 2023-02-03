@@ -69,7 +69,7 @@ class HomePageFragment : Fragment() {
             for (i in api_games) {
                 listOfGameIds.add(i.appid)
             }
-            listOfGameIds = listOfGameIds.subList(0, 10)
+            listOfGameIds = listOfGameIds.subList(0, 15)
             var gameDetails: JsonObject
             val gameRetriever = GameRetriever()
             var jsonObject: JsonObject
