@@ -57,18 +57,24 @@ class SignInFragment : Fragment() {
     }
 
     private fun login() {
-        val email = email.text.toString().trim()
-        val password = password.text.toString().trim()
-        if(email.isBlank() || password.isBlank()) {
-            Toast.makeText(requireContext(), "Tous les champs sont obligatoires", Toast.LENGTH_SHORT).show()
+        val emailText = email.text.toString().trim()
+        val passwordText = password.text.toString().trim()
+        if(emailText.isBlank()) {
+            email.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0)
             return
         }
-        auth.signInWithEmailAndPassword(email.trim(),password.trim()).addOnCompleteListener() {
+        else {email.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)}
+        if(passwordText.isBlank()) {
+            password.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0)
+            return
+        }
+        else {password.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)}
+        auth.signInWithEmailAndPassword(emailText.trim(),passwordText.trim()).addOnCompleteListener() {
                 task ->
             if (task.isSuccessful) {
                 Toast.makeText(requireContext(), "Connexion Success", Toast.LENGTH_SHORT).show()
                 findNavController().navigate(
-                    SignInFragmentDirections.actionSignInFragmentToHomePageFragment(email,"","","",""))
+                    SignInFragmentDirections.actionSignInFragmentToHomePageFragment(emailText,"","","","",emailText))
             }
             else {
                 Log.w(ContentValues.TAG, "createUserWithEmail:failure ", task.exception)

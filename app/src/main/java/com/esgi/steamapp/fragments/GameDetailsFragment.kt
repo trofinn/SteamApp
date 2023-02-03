@@ -27,6 +27,7 @@ class GameDetailsFragment : Fragment() {
     private lateinit var gameDescription : TextView
     private lateinit var gameId : String
     private lateinit var database : FirebaseDatabase
+    private lateinit var email : String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -44,6 +45,7 @@ class GameDetailsFragment : Fragment() {
         gameEditor = view.findViewById(R.id.editeur2)
         gamePhoto = view.findViewById(R.id.image)
         gameDescription = view.findViewById(R.id.data_transition_view)
+        email = GameDetailsFragmentArgs.fromBundle(requireArguments()).username.toString()
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
         toolbar.setNavigationOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
@@ -85,8 +87,9 @@ class GameDetailsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater : MenuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.elements, menu)
-        val database_likes = database.getReference().child("Likes")
-        val database_favorites = database.getReference().child("Favorites")
+        val list = email.split("@")
+        val database_likes = database.getReference().child(list[0]).child("Likes")
+        val database_favorites = database.getReference().child(list[0]).child("Favorites")
         database_likes.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(snapshot.child(gameId).exists()) {
@@ -107,7 +110,8 @@ class GameDetailsFragment : Fragment() {
     }
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId)  {
         R.id.like -> {
-            val databaseLikes = database.getReference().child("Likes")
+            val list = email.split("@")
+            val databaseLikes = database.getReference().child(list[0]).child("Likes")
             val eventListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(!snapshot.exists()) {
@@ -132,7 +136,8 @@ class GameDetailsFragment : Fragment() {
         }
 
         R.id.favorite -> {
-            val databaseFavorites = database.getReference().child("Favorites")
+            val list = email.split("@")
+            val databaseFavorites = database.getReference().child(list[0]).child("Favorites")
             val eventListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if(!snapshot.exists()) {

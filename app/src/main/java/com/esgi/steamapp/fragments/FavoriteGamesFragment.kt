@@ -19,7 +19,7 @@ class FavoriteGamesFragment : Fragment() {
     lateinit var recyclerView : RecyclerView
     lateinit var emptyFavorites : ImageView
     private lateinit var database : FirebaseDatabase
-
+    private lateinit var email : String
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
         return LayoutInflater.from(requireContext())
@@ -30,7 +30,7 @@ class FavoriteGamesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
         recyclerView = view.findViewById(R.id.game_list)
-
+        email = FavoriteGamesFragmentArgs.fromBundle(requireArguments()).username.toString()
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -53,7 +53,7 @@ class FavoriteGamesFragment : Fragment() {
                                     game.editeur,
                                     game.image,
                                     key!!,
-                                    game.description,"")
+                                    game.description,email)
                             )
                         }
                     })
@@ -64,6 +64,6 @@ class FavoriteGamesFragment : Fragment() {
                     emptyFavorites.visibility = View.VISIBLE
                 }
             }
-        },"Favorites")
+        },"Favorites",email)
     }
 }

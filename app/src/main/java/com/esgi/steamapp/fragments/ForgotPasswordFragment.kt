@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
+import androidx.navigation.fragment.NavHostFragment
 import com.esgi.steamapp.activity.MainActivity
 import com.esgi.steamapp.R
 import com.google.firebase.auth.FirebaseAuth
@@ -44,16 +44,17 @@ class ForgotPasswordFragment : Fragment() {
         backButton.setOnClickListener() {
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
+
         }
     }
     private fun sendRecoveryMail() {
-        val email = email.text.toString().trim()
+        val emailText = email.text.toString().trim()
 
-        if(email.isBlank()) {
-            Toast.makeText(requireContext(), "Tous les champs sont obligatoires", Toast.LENGTH_SHORT).show()
+        if(emailText.isBlank()) {
+            email.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0)
             return
         }
-        auth.sendPasswordResetEmail(email).addOnCompleteListener{
+        auth.sendPasswordResetEmail(emailText).addOnCompleteListener{
                 task -> if (task.isSuccessful) {
                     sendMail.setOnClickListener() {
                         val intent = Intent(requireContext(), MainActivity::class.java)

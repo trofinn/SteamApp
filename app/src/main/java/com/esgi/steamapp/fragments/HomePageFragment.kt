@@ -34,10 +34,9 @@ class HomePageFragment : Fragment() {
     val gamesMap = mutableMapOf<String, Game>()
     var gamesFiltered = mutableMapOf<String, Game>()
     lateinit var searchView: SearchView
-
-    //var rankList: MutableList<MostPlayedGamesResponse.Response.Rank> = mutableListOf()
-    //var theGames: MutableList<JsonObject> = mutableListOf()
+    lateinit var searchedGamesList : RecyclerView
     val gameRetriever: GameRetriever = GameRetriever()
+    lateinit var email : String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,9 +54,9 @@ class HomePageFragment : Fragment() {
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.toolbar))
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         recyclerView = view.findViewById(R.id.game_list)
-
+        searchedGamesList = view.findViewById(R.id.search_game_list)
         searchView = view.findViewById<SearchView>(R.id.search_bar)
-
+        email = HomePageFragmentArgs.fromBundle(requireArguments()).username.toString()
         GlobalScope.launch(Dispatchers.Main) {
             view.findViewById<ProgressBar>(R.id.progressbar).visibility = View.VISIBLE
             recyclerView.visibility = View.GONE
@@ -141,7 +140,7 @@ class HomePageFragment : Fragment() {
                     "[Valve, Hidden Path Entertainment]",
                     url,
                     "730",
-                    view.findViewById<TextView>(R.id.description).text.toString(),""
+                    view.findViewById<TextView>(R.id.description).text.toString(),email
                 )
             )
         }
@@ -152,6 +151,7 @@ class HomePageFragment : Fragment() {
         gamesMap: MutableMap<String, Game>,
         context: Context
     ): MutableList<Game> {
+        val list = email.split("@")
         val gamesList = gamesMap.values.toMutableList()
         recyclerView.apply {
             layoutManager = GridLayoutManager(context, 1)
@@ -164,7 +164,7 @@ class HomePageFragment : Fragment() {
                             game.editeur,
                             game.image,
                             key!!,
-                            game.description,""
+                            game.description,email
                         )
                     )
                 }
@@ -174,6 +174,7 @@ class HomePageFragment : Fragment() {
     }
 
     private suspend fun filter(newText: String) {
+        val list = email.split("@")
         gamesFiltered.clear()
         val searchText = newText.lowercase(Locale.getDefault())
         val errorHandler = CoroutineExceptionHandler  {
@@ -227,7 +228,7 @@ class HomePageFragment : Fragment() {
                                                 game.editeur,
                                                 game.image,
                                                 key!!,
-                                                game.description,""
+                                                game.description,email
                                             )
                                         )
                                     }
@@ -258,7 +259,7 @@ class HomePageFragment : Fragment() {
                                 game.editeur,
                                 game.image,
                                 key!!,
-                                game.description,""
+                                game.description,email
                             )
                         )
                     }
@@ -275,15 +276,17 @@ class HomePageFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.like -> {
+            val list = email.split("@")
             findNavController().navigate(
-                HomePageFragmentDirections.actionHomePageFragmentToLikedGamesFragment()
+                HomePageFragmentDirections.actionHomePageFragmentToLikedGamesFragment(email)
             )
             true
         }
 
         R.id.favorite -> {
+            val list = email.split("@")
             findNavController().navigate(
-                HomePageFragmentDirections.actionHomePageFragmentToFavoriteGamesFragment()
+                HomePageFragmentDirections.actionHomePageFragmentToFavoriteGamesFragment(email)
             )
             true
         }

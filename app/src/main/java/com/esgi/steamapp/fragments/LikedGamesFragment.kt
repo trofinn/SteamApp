@@ -22,6 +22,7 @@ class LikedGamesFragment : Fragment() {
     lateinit var recyclerView : RecyclerView
     lateinit var emptyLikes : ImageView
     private lateinit var database : FirebaseDatabase
+    private lateinit var email : String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -33,7 +34,7 @@ class LikedGamesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
         recyclerView = view.findViewById(R.id.game_list)
-
+        email = LikedGamesFragmentArgs.fromBundle(requireArguments()).username.toString()
         val toolbar = view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -56,7 +57,7 @@ class LikedGamesFragment : Fragment() {
                                     game.editeur,
                                     game.image,
                                     key!!,
-                                    game.description,""))
+                                    game.description,email))
                         }
                     })
                 }
@@ -66,8 +67,28 @@ class LikedGamesFragment : Fragment() {
                     emptyLikes.visibility = View.VISIBLE
                 }
             }
-        },"Likes")
+        },"Likes", email)
     }
+
+
+}
+
+fun getGamesFromDatabase(myCallback: GameListCallback, reference : String, email : String) {
+    val database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
+    val games : MutableMap<String, Game> = mutableMapOf()
+    val list = email.split("@")
+    val databaseReference = database.reference.child(list[0]).child(reference)
+    databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            for (snapshot : DataSnapshot in snapshot.children) {
+                val key = snapshot.key
+                val game = Game(snapshot.child("name").getValue().toString(),snapshot.child("dev").getValue().toString(),"", snapshot.child("photo").getValue().toString(), snapshot.child("description").getValue().toString())
+                games.set(key.toString(), game)
+            }
+            myCallback.onCallback(games)
+        }
+        override fun onCancelled(error: DatabaseError) {}
+    })
 }
 
 interface GameListCallback {
@@ -83,19 +104,3 @@ fun <K, V> getKey(map: Map<K, V>, target: V): K? {
     return null
 }
 
-fun getGamesFromDatabase(myCallback: GameListCallback, reference : String) {
-    val database = FirebaseDatabase.getInstance("https://steamapp-558cf-default-rtdb.europe-west1.firebasedatabase.app")
-    val games : MutableMap<String, Game> = mutableMapOf()
-    val databaseReference = database.reference.child(reference)
-    databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-        override fun onDataChange(snapshot: DataSnapshot) {
-            for (child : DataSnapshot in snapshot.children) {
-                val key = child.key
-                val game = Game(child.child("name").getValue().toString(),child.child("dev").getValue().toString(),"", child.child("photo").getValue().toString(), child.child("description").getValue().toString())
-                games.set(key.toString(), game)
-            }
-            myCallback.onCallback(games)
-        }
-        override fun onCancelled(error: DatabaseError) {}
-    })
-}

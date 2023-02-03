@@ -17,12 +17,12 @@ import com.google.firebase.auth.FirebaseAuth
 
 
 class SignUpFragment : Fragment() {
-    lateinit var user_name : EditText
+    lateinit var userName : EditText
     lateinit var email : EditText
     lateinit var password : EditText
-    lateinit var password_verification : EditText
-    private lateinit var sign_up : Button
-    private lateinit var back_button : ImageButton
+    lateinit var passwordVerification : EditText
+    private lateinit var signUp : Button
+    private lateinit var backButton : ImageButton
     private lateinit var auth : FirebaseAuth
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -33,38 +33,44 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        user_name = view.findViewById(R.id.user_name)
+        userName = view.findViewById(R.id.user_name)
         email = view.findViewById(R.id.email)
         password = view.findViewById(R.id.password)
-        password_verification = view.findViewById(R.id.password_verification)
-        sign_up = view.findViewById(R.id.new_account)
-        back_button = view.findViewById(R.id.back_button)
+        passwordVerification = view.findViewById(R.id.password_verification)
+        signUp = view.findViewById(R.id.new_account)
+        backButton = view.findViewById(R.id.back_button)
         auth = FirebaseAuth.getInstance()
-        sign_up.setOnClickListener() {
+        signUp.setOnClickListener() {
             signUpUser()
         }
 
-        back_button.setOnClickListener() {
+        backButton.setOnClickListener() {
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
         }
     }
 
     private fun signUpUser() {
-        var user_name = user_name.text.toString()
-        var email = email.text.toString()
-        var password = password.text.toString()
-        var password_verification = password_verification.text.toString()
+        var userNameText = userName.text.toString()
+        var emailText = email.text.toString()
+        var passwordText = password.text.toString()
+        var passwordVerificationText = passwordVerification.text.toString()
 
-        if (user_name.isBlank() || email.isBlank() || password.isBlank() || password_verification.isBlank()) {
-            Toast.makeText(requireContext(), "Tous les champs sont obligatoires", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (password != password_verification) {
+        if (userNameText.isBlank()) { userName.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0); return}
+        else {userName.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)}
+        if (emailText.isBlank()) { email.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0); return }
+        else {email.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)}
+        if (passwordVerificationText.isBlank()) { passwordVerification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0); return}
+        else {passwordVerification.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)}
+        if (passwordText.isBlank()) { password.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0); return}
+        else {password.setCompoundDrawablesWithIntrinsicBounds(0,0,0,0)}
+        if (passwordText != passwordVerificationText) {
+            passwordVerification.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0)
+            password.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.warning,0)
             Toast.makeText(requireContext(), "Le mot de passe ne corresponde pas", Toast.LENGTH_SHORT).show()
             return
         }
-        auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener() {
+        auth.createUserWithEmailAndPassword(emailText,passwordText).addOnCompleteListener() {
             if (it.isSuccessful) {
                 startActivity(Intent(requireContext(), SignUpActivity::class.java))
                 Toast.makeText(requireContext(), "Inscription complete", Toast.LENGTH_SHORT).show()

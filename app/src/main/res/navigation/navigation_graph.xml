@@ -37,6 +37,10 @@
         <action
             android:id="@+id/action_homePageFragment_to_signInFragment"
             app:destination="@id/signInFragment" />
+        <argument
+            android:name="username"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/gameDetailsFragment"
@@ -79,6 +83,10 @@
         <action
             android:id="@+id/action_likedGamesFragment_to_gameDetailsFragment"
             app:destination="@id/gameDetailsFragment" />
+        <argument
+            android:name="username"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/favoriteGamesFragment"
@@ -92,6 +100,10 @@
         <action
             android:id="@+id/action_favoriteGamesFragment_to_gameDetailsFragment"
             app:destination="@id/gameDetailsFragment" />
+        <argument
+            android:name="username"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/signInFragment"
